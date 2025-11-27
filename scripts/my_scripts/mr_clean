@@ -1,0 +1,4 @@
+#!/bin/bash
+
+make fclean
+find . \( -name "*~" -o -name "#*#" -o -name "a.out" -o -name "*.gcda" -o -name "*.gcno" -o -name "*.o" -o -name "*.a" -o -name "vgcore.*" -o -name "*.d" \) -exec rm {} \; 2>/dev/null

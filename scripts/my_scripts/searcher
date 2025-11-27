@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import os
+import re
+import sys
+from colorama import Fore, Style
+
+# Installation de colorama : pip install colorama
+
+def chercher_mots_cles(dossier, mot_cle):
+    fichiers_trouves = []
+    for racine, sous_dossiers, fichiers in os.walk(dossier):
+        for fichier in fichiers:
+            chemin_fichier = os.path.join(racine, fichier)
+            try:
+                with open(chemin_fichier, 'r', encoding='utf-8') as f:
+                    for num_ligne, ligne in enumerate(f, start=1):
+                        if re.search(mot_cle, ligne):
+                            fichiers_trouves.append((chemin_fichier, num_ligne, ligne.strip()))
+            except (UnicodeDecodeError, PermissionError):
+                # Ignorer les fichiers qui ne peuvent pas être lus ou accédés
+                pass
+    return fichiers_trouves
+
+def afficher_resultats(resultats):
+    if resultats:
+        print("Les fichiers contenant le mot clé sont :")
+        for resultat in resultats:
+            fichier, num_ligne, ligne = resultat
+            ligne_formattee = f"Ligne {num_ligne}: {Style.RESET_ALL}{ligne}"
+            ligne_formattee = ligne_formattee.replace(mot_cle_recherche, f"{Fore.RED}{mot_cle_recherche}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}Fichier: {fichier}:{num_ligne}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}{ligne_formattee}{Style.RESET_ALL}\n")
+    else:
+        print("Aucun fichier ne contient le mot clé.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: searcher <dossier> <mot_clé>")
+        sys.exit(1)
+
+    dossier_a_explorer = sys.argv[1]
+    mot_cle_recherche = sys.argv[2]
+
+    if not os.path.isdir(dossier_a_explorer):
+        print("Le chemin spécifié n'est pas un dossier valide.")
+        sys.exit(1)
+
+    resultats = chercher_mots_cles(dossier_a_explorer, mot_cle_recherche)
+    afficher_resultats(resultats)

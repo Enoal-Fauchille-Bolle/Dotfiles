@@ -1,0 +1,340 @@
+#!/usr/bin/python3
+from sys import argv
+from sys import exit
+from colors import *
+import os
+
+# Changelog: Added --time-debug option &
+
+# TODO:
+# Display: "Ignored 4 errors in (folder)"
+# Do not use mr_clean
+
+############################## Configuration ##############################
+
+# Rules that you don't want to check by default
+# default_ignored_rules = []
+default_ignored_rules = ["O1"]
+
+# Folders that you don't want to check by default
+# default_ignored_folders = ["libs"]
+default_ignored_folders = ["node_modules", ".stack-work"]
+
+# Whether or not you want to display the errors with colors individually
+individual_colored_errors = True
+
+# Message displayed when there is no error
+no_error_message = "Everything is fine, good job. Hugo will kiss you"
+
+# Whether or not you want to display the time of coding style check
+time_debug = False
+
+# Version of the program
+version = "1.0.2"
+
+################################ Help Page ################################
+
+def help_page():
+    print(f"{BWhite}USAGE{NC}")
+    print(f"    banana [{UWhite}options{NC}]\n")
+    print(f"{BWhite}DESCRIPTION{NC}")
+    print(f"    BananaPy is a tool which is using the default")
+    print(f"    banana checker but with more features.\n")
+    print(f"{BWhite}OPTIONS{NC}")
+    print(f"    {BWhite}-h{NC}")
+    print(f"        Display this help page.\n")
+    print(f"    {BWhite}-ir, --ignore-rules{NC}")
+    print(f"        Ignore the rules that you want.\n")
+    print(f"    {BWhite}-if, --ignore-files{NC}")
+    print(f"        Ignore the files & folders that you want.\n")
+    print(f"    {BWhite}-a, --all{NC}")
+    print(f"        Show all errors including ignored ones\n")
+    print(f"    {BWhite}-td, --time-debug{NC}")
+    print(f"        Display the time of the coding style check\n")
+    print(f"    {BWhite}-v, --version{NC}")
+    print(f"        Display the version of the programm\n")
+    print(f"{BWhite}EXIT CODE{NC}")
+    print(f"    {BWhite}0{NC}   No Coding Style error")
+    print(f"    {BWhite}1{NC}   Coding Style Infos")
+    print(f"    {BWhite}2{NC}   Minor Coding Style errors")
+    print(f"    {BWhite}3{NC}   Major Coding Style errors")
+    print(f"    {BWhite}4{NC}   Fatal Coding Style errors")
+    print(f"    {BWhite}84{NC}  Program error\n")
+    print(f"{BWhite}AUTHOR{NC}")
+    print(f"        Written by Enoal Fauchille-Bolle")
+    exit(0)
+
+################################ Help Page ################################
+
+def display_version():
+    print(f"{BWhite}BananaPy{NC} version {version}")
+    print(f"By Enoal Fauchille-Bolle")
+    print(f"{UWhite}Thank you for using BananaPy !!!{NC}")
+    exit(0)
+
+################################# Checking #################################
+
+def check_report():
+    if not os.path.isfile("coding-style-reports.log"):
+        print(f"{BRed}Error:{NC} The file coding-style-reports.log doesn't exist.")
+        exit(84)
+
+################################# Parsing #################################
+
+valid_options = ["-h", "--help", "-ir", "--ignore-rules", "-if", "--ignore-files", "-a", "--all", "-v", "--version", "-td", "--time-debug"]
+
+def parse_report(options):
+    f = open("coding-style-reports.log", "r")
+    errors_list = f.read()[:-1].split("\n")
+    if errors_list == [""]:
+        errors_list = []
+    errors_list = filter_error_files(errors_list, options)
+    errors_types = {}
+    for error in errors_list:
+        ignore_error = False
+        if not "-a" in options.keys():
+            for file in options["-if"]:
+                if file in ":".join(error.split(':')[:2]):
+                    ignore_error = True
+        if ignore_error:
+            continue
+        if not error.split(':')[2][1:] in errors_types.keys():
+            errors_types[error.split(':')[2][1:]] = {}
+        if not error.split(':')[3] in errors_types[error.split(':')[2][1:]]:
+            errors_types[error.split(':')[2][1:]][error.split(':')[3]] = 0
+        errors_types[error.split(':')[2][1:]][error.split(':')[3]] += 1
+    return (errors_list, errors_types)
+
+def parse_args():
+    options = {}
+    i = 1
+    while i < len(argv):
+        arg = argv[i]
+        if arg[0] != "-" or not arg in valid_options:
+            print(f"{BRed}Error:{NC} Unknown argument: {UWhite}{arg}{NC}")
+            exit(84)
+        if arg == "-h" or arg == "--help":
+            options["-h"] = None
+        if arg == "-v" or arg == "--version":
+            options["-v"] = None
+        if arg == "-ir" or arg == "--ignore-rules":
+            options["-ir"] = []
+            i += 1
+            while i < len(argv) and len(argv[i]) > 0 and argv[i][0] != "-":
+                options["-ir"].append(argv[i])
+                i += 1
+            if len(options["-ir"]) == 0:
+                print(f"{BRed}Error:{NC} You need to specify at least one rule to ignore.")
+                exit(84)
+            i -= 1
+        if arg == "-if" or arg == "--ignore-files":
+            options["-if"] = []
+            i += 1
+            while i < len(argv) and len(argv[i]) > 0 and argv[i][0] != "-":
+                options["-if"].append(argv[i])
+                i += 1
+            if len(options["-if"]) == 0:
+                print(f"{BRed}Error:{NC} You need to specify at least one file or folder to ignore.")
+                exit(84)
+            i -= 1
+        if arg == "-a" or arg == "--all":
+            options["-a"] = None
+        if arg == "-td" or arg == "--time-debug":
+            options["-td"] = None
+        i += 1
+    if "-a" in options.keys() and "-ir" in options.keys():
+        print(f"{BRed}Error:{NC} You can't use -a and -ir at the same time.")
+        exit(84)
+    if "-a" in options.keys() and "-if" in options.keys():
+        print(f"{BRed}Error:{NC} You can't use -a and -if at the same time.")
+        exit(84)
+    return options
+
+def parse_config(options):
+    if not "-ir" in options.keys():
+        options["-ir"] = []
+    options["-ir"].extend(default_ignored_rules)
+    if not "-if" in options.keys():
+        options["-if"] = []
+    options["-if"].extend(default_ignored_folders)
+    return options
+
+def filter_errors_summary_rules(errors_summary, options):
+    filtered_errors_sommary = {}
+    ignored_rules = {}
+    for error_types in errors_summary:
+        for error in errors_summary[error_types]:
+            to_remove = False
+            for rule in options["-ir"]:
+                if rule in error:
+                    to_remove = True
+            if not to_remove:
+                filtered_errors_sommary[error_types] = errors_summary[error_types]
+            else:
+                ignored_rules[f"'{error}'"] = errors_summary[error_types][error]
+    return filtered_errors_sommary, ignored_rules
+
+def filter_errors_list_rules(errors_list, options):
+    filtered_errors_list = []
+    to_remove = False
+    for error in errors_list:
+        to_remove = False
+        for rule in options["-ir"]:
+            if rule in error.split(':')[3]:
+                to_remove = True
+        if not to_remove:
+            filtered_errors_list.append(error)
+    return filtered_errors_list
+
+def filter_error_rules(errors_list, errors_summary, options):
+    ignored_rules = {}
+    if not "-a" in options.keys():
+        errors_summary, ignored_rules = filter_errors_summary_rules(errors_summary, options)
+        errors_list = filter_errors_list_rules(errors_list, options)
+    return errors_list, errors_summary, ignored_rules
+
+def filter_error_files(errors_list, options):
+    filtered_errors_list = []
+    for error in errors_list:
+        to_remove = False
+        for file in options["-if"]:
+            if file in error.split(':')[0] and not "-a" in options.keys():
+                to_remove = True
+        if not to_remove:
+            filtered_errors_list.append(error)
+    return filtered_errors_list
+
+################################### Timer ###################################
+
+timer = 0
+
+def start_timer():
+    global timer
+    timer = os.times().elapsed
+
+def stop_timer():
+    global timer
+    return os.times().elapsed - timer
+
+################################# Displaying #################################
+
+def errors_type_count(errors_type, ignored_rules_raw):
+    count = 0
+    ignored_rules = [rule[1:-1] for rule in ignored_rules_raw.keys()]
+    for error_type in errors_type:
+        if error_type in ignored_rules:
+            continue
+        count += int(errors_type[error_type])
+    return count
+
+def errors_count(errors, ignored_rules):
+    count = 0
+    for errors_type in errors:
+        count += errors_type_count(errors[errors_type], ignored_rules)
+    return count
+
+def display_result(errors_summary, errors_list, ignored_rules, update):
+    print(f"{BWhite}################### Summary ###################{NC}")
+    print(f"{UWhite}{errors_count(errors_summary, ignored_rules)} Error(s):{NC}")
+    if "FATAL" in errors_summary.keys():
+        print(f"{BRed}- {errors_type_count(errors_summary['FATAL'], ignored_rules)} Fatal(s){NC}")
+    if "MAJOR" in errors_summary.keys():
+        print(f"{Red}- {errors_type_count(errors_summary['MAJOR'], ignored_rules)} Major(s){NC}")
+    if "MINOR" in errors_summary.keys():
+        print(f"{Yellow}- {errors_type_count(errors_summary['MINOR'], ignored_rules)} Minor(s){NC}")
+    if "INFO" in errors_summary.keys():
+        print(f"{Blue}- {errors_type_count(errors_summary['INFO'], ignored_rules)} Info(s){NC}")
+    if errors_count(errors_summary, ignored_rules) == 0:
+        print(f"{Green}- {no_error_message}{NC}")
+    if len(ignored_rules) > 0:
+        # for rule in ignored_rules:
+        #     ignored.append(f"{} '{rule}'")
+        # print(f"Ignored {', '.join(ignored)}")
+        print(f"Ignored {', '.join([f'{ignored_rules[rule]} {rule}' for rule in ignored_rules])}")
+    if errors_count(errors_summary, ignored_rules) != 0:
+        print(f"{BWhite}################### Errors ####################{NC}")
+    for error in errors_list:
+        if individual_colored_errors:
+            if error.split(':')[2][1:] == "FATAL":
+                print(f"{BRed}{error}{NC}")
+            if error.split(':')[2][1:] == "MAJOR":
+                print(f"{Red}{error}{NC}")
+            if error.split(':')[2][1:] == "MINOR":
+                print(f"{Yellow}{error}{NC}")
+            if error.split(':')[2][1:] == "INFO":
+                print(f"{Blue}{error}{NC}")
+        else:
+            print(f"{error}")
+    print(f"{BWhite}###############################################{NC}")
+    if update:
+        print(f"{BGreen}Coding Style Checker got an update !!!{NC}")
+        print(f"{BWhite}You should check your entire directory{NC}")
+        print(f"{BWhite}with 'bananapy -a'{NC}")
+
+def check_update(command_output):
+    return "Downloaded newer image" in command_output
+
+#################################### Main ####################################
+
+def create_report():
+    if time_debug:
+        print(f"⌛ {Cyan}Clearing temp files...")
+        start_timer()
+    stream = os.popen("mr_clean 2>/dev/null")
+    if time_debug:
+        print(f"{Green} ✔ Cleared temp files {Grey}[{stop_timer():.3f}s]{NC}")
+        print(f"⌛ {Cyan}Creating report...")
+    start_timer()
+    stream = os.popen("coding-style . .")
+    output = stream.read()
+    if time_debug:
+        print(f"{Green} ✔ Created report {Grey}[{stop_timer():.3f}s]{NC}")
+    if output == "":
+        print(f"{BRed}Error:{NC} Cannot use command 'coding-style'")
+        print(f"       Make sure that you have installed it at")
+        print(f"       https://github.com/Epitech/coding-style-checker")
+        print(f"       and added it to your PATH")
+        exit(84)
+    return output
+
+def delete_report():
+    os.remove("coding-style-reports.log")
+
+def exit_code(errors_summary):
+    if "INFO" in errors_summary.keys():
+        exit(1)
+    if "MINOR" in errors_summary.keys():
+        exit(2)
+    if "MAJOR" in errors_summary.keys():
+        exit(3)
+    if "FATAL" in errors_summary.keys():
+        exit(4)
+
+def main():
+    options = parse_args()
+    options = parse_config(options)
+    if "-h" in options.keys():
+        help_page()
+    if "-v" in options.keys():
+        display_version()
+    if "-td" in options.keys():
+        global time_debug
+        time_debug = True
+
+    command_output = create_report()
+    update = check_update(command_output)
+    if time_debug:
+        print(f"⌛ {Cyan}Parsing report...")
+        start_timer()
+    check_report()
+    errors_list, errors_summary = parse_report(options)
+    delete_report()
+    errors_list, errors_summary, ignored_rules = filter_error_rules(errors_list, errors_summary, options)
+    if time_debug:
+        print(f"{Green} ✔ Parsed report {Grey}[{stop_timer():.3f}s]{NC}")
+    display_result(errors_summary, errors_list, ignored_rules, update)
+    exit_code(errors_summary)
+
+if __name__ == "__main__":
+    main()
+

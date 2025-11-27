@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker pull epitechcontent/epitest-docker
+docker run --rm -it -v "$(pwd):/usr/app" epitechcontent/epitest-docker
