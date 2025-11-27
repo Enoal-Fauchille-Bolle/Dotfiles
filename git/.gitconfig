@@ -1,0 +1,21 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = Enoal Fauchille-Bolle
+	email = enoal.fauchille-bolle@epitech.eu
+	signingKey = 4FE66713D351FF8A69E1F4EAB033E18573A6EB57
+[core]
+	excludesfile = /home/enoal/.gitignore
+[init]
+	defaultBranch = main
+[commit]
+	gpgSign = true
+[tag]
+	forceSignAnnotated = true
+[gpg "ssh"]
+	program = ssh-keygen
+[gpg]
+	format = openpgp
