@@ -8,7 +8,7 @@
 	email = enoal.fauchille-bolle@epitech.eu
 	signingKey = 4FE66713D351FF8A69E1F4EAB033E18573A6EB57
 [core]
-	excludesfile = /home/enoal/.gitignore
+	excludesfile = /home/enoal/.gitignore_global
 [init]
 	defaultBranch = main
 [commit]
