@@ -1,4 +1,3 @@
-
 [Default Applications]
 text/html=google-chrome.desktop
 x-scheme-handler/http=google-chrome.desktop
@@ -6,3 +5,10 @@ x-scheme-handler/https=google-chrome.desktop
 x-scheme-handler/about=google-chrome.desktop
 x-scheme-handler/unknown=google-chrome.desktop
 x-scheme-handler/webcal=google-chrome.desktop
+x-scheme-handler/discord-831593107883032657=discord-831593107883032657.desktop
+application/vnd.ms-publisher=org.gnome.TextEditor.desktop
+video/mp4=org.videolan.VLC.desktop
+
+[Added Associations]
+application/vnd.ms-publisher=org.gnome.TextEditor.desktop;
+video/mp4=org.videolan.vlc.desktop;org.videolan.VLC.desktop;
