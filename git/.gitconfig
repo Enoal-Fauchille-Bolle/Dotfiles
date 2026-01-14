@@ -19,3 +19,5 @@
 	program = ssh-keygen
 [gpg]
 	format = openpgp
+[rerere]
+	enabled = true
