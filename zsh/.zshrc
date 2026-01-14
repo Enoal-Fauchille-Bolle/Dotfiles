@@ -181,6 +181,7 @@ alias vg="valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=ye
 alias repository-mirroring="cat ~/.ssh/RepositoryMirroring | xclip -selection clipboard"
 alias complete-recent-discord-quest="cat ~/Documents/complete-recent-discord-quest.js | xclip -selection clipboard"
 alias kctl="kubectl"
+alias end="notify-send --urgency=low 'Finished'"
 
 # Others
 alias f="fuck"
