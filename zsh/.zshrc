@@ -170,7 +170,7 @@ alias ps='procs'
 alias delivery="cd ~/Delivery/Projects"
 alias emacs='emacs -nw'
 alias cl='clear'
-alias ter='gnome-terminal'
+alias ter='(ptyxis --new-window --working-directory="$(pwd)" > /dev/null 2>&1 &)'
 alias exitcode='echo $?'
 alias csc='bananapy'
 alias dc="docker"
