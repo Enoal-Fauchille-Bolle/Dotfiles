@@ -186,7 +186,7 @@ alias end="notify-send --urgency=low 'Finished'"
 # Others
 alias f="fuck"
 alias edit-rc="~/my_scripts/edit_zshrc.sh"
-alias refresh-rc="source ~/.zshrc && clear"
+alias refresh-rc="source ~/.zshrc"
 alias create-shortcut="ln -sf"
 alias root="sudo nautilus /"
 alias op="chmod 744"
