@@ -240,3 +240,6 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Load secrets if the file exists
 [ -f "$HOME/.zshrc.secrets" ] && source "$HOME/.zshrc.secrets"
+
+# Homebrew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
