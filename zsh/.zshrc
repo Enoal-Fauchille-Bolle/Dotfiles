@@ -216,6 +216,9 @@ alias docker-compose="docker compose"
 # Add my_scripts to PATH
 export PATH="/home/enoal/my_scripts:$PATH"
 
+# Less configuration
+export LESS="-RFMiS --incsearch --use-color -j.5"
+
 # PyEnv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
