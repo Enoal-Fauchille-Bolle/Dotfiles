@@ -169,6 +169,7 @@ alias tree='eza --tree --icons'
 # alias du='dust'
 alias top='btop'
 alias ps='procs'
+alias k9s='k9s --splashless --all-namespaces'
 
 # Code Utility
 alias delivery="cd ~/Delivery/Projects"
@@ -185,6 +186,7 @@ alias vg="valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=ye
 alias complete-recent-discord-quest="cat ~/Documents/complete-recent-discord-quest.js | xclip -selection clipboard"
 alias kctl="kubectl"
 alias end="notify-send --urgency=low 'Finished'"
+alias ag="antigravity"
 
 # Others
 alias f="fuck"
@@ -207,6 +209,7 @@ alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
 alias t="todo.sh"
 alias clipboard="xclip -selection clipboard"
 alias cb="clipboard"
+alias docker-compose="docker compose"
 
 ##############################################################################
 
