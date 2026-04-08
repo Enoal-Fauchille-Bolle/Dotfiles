@@ -51,6 +51,13 @@ video/x-flc=org.videolan.VLC.desktop
 video/x-fli=org.videolan.VLC.desktop
 video/x-flv=org.videolan.VLC.desktop
 application/x-trash=org.gnome.TextEditor.desktop
+application/x-7z-compressed=org.gnome.FileRoller.desktop
+x-scheme-handler/mailto=google-chrome.desktop
+application/x-genesis-32x-rom=org.gnome.TextEditor.desktop
+application/x-extension-burp=install4j_bn5kb2-BurpSuiteCommunity.desktop
+x-scheme-handler/burp=install4j_bn5kb2-BurpSuiteCommunity.desktop
+application/json=org.gnome.TextEditor.desktop
+application/xml=org.gnome.TextEditor.desktop
 
 [Added Associations]
 application/vnd.ms-publisher=org.gnome.TextEditor.desktop;
@@ -97,3 +104,9 @@ video/x-flc=org.videolan.VLC.desktop;
 video/x-fli=org.videolan.VLC.desktop;
 video/x-flv=org.videolan.VLC.desktop;
 application/x-trash=org.gnome.TextEditor.desktop;
+application/x-7z-compressed=org.gnome.FileRoller.desktop;
+x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;
+x-scheme-handler/tel=org.gnome.Shell.Extensions.GSConnect.desktop;
+application/x-genesis-32x-rom=org.gnome.TextEditor.desktop;
+application/json=org.gnome.TextEditor.desktop;
+application/xml=org.gnome.TextEditor.desktop;
