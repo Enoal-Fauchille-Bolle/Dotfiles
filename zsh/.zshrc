@@ -232,7 +232,8 @@ export NVM_DIR="$HOME/.nvm"
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Zoxide
-eval "$(zoxide init zsh)"
+export _ZO_ECHO=1
+eval "$(zoxide init zsh --cmd cd)"
 
 # pnpm
 export PNPM_HOME="/home/enoal/.local/share/pnpm"
