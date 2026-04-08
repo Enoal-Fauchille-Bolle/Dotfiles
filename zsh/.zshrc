@@ -253,3 +253,10 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Homebrew
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Tirith
+# eval "$(tirith init --shell zsh)"
+
+# Bun
+export BUN_INSTALL="$HOME/.bun" 
+export PATH="$BUN_INSTALL/bin:$PATH"
