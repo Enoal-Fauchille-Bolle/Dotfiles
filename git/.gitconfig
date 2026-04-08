@@ -5,8 +5,8 @@
 	required = true
 [user]
 	name = Enoal Fauchille-Bolle
-	email = 146712993+Enoal-Fauchille-Bolle@users.noreply.github.com
-	signingKey = 4FE66713D351FF8A69E1F4EAB033E18573A6EB57
+	email = enoal.fauchille-bolle@epitech.eu
+	signingkey = /home/enoal/.ssh/id_ed25519.pub
 [core]
 	excludesfile = /home/enoal/.gitignore_global
 [init]
@@ -18,6 +18,12 @@
 [gpg "ssh"]
 	program = ssh-keygen
 [gpg]
-	format = openpgp
+	format = ssh
 [rerere]
 	enabled = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
