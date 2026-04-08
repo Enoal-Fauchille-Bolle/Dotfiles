@@ -80,6 +80,9 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # plugins=( git zsh-autosuggestions fzf )
 plugins=( git zsh-autosuggestions fzf tirith )
 
+# Set custom location for zcompdump cache
+export ZSH_COMPDUMP="$HOME/.cache/zsh/.zcompdump-$HOST"
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
