@@ -164,9 +164,9 @@ alias ls='eza --icons --group-directories-first'
 alias ll='eza -l --icons --group-directories-first --git'
 alias la='eza -la --icons --group-directories-first --git'
 alias tree='eza --tree --icons'
-alias cat='bat --style=auto'
-alias find='fd'
-alias du='dust'
+# alias ccat='bat --style=auto'
+# alias ffind='fd'
+# alias du='dust'
 alias top='btop'
 alias ps='procs'
 
@@ -201,8 +201,8 @@ alias cop="ghcs"
 alias azerdev-host="ssh azerty@azerdev.live"
 alias myip="curl https://ipinfo.io/ip && echo ''"
 alias vencord='sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"'
-alias cd="z"
-alias cdi="zi"
+# alias cd="z"
+# alias cdi="zi"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
 alias t="todo.sh"
 alias clipboard="xclip -selection clipboard"
