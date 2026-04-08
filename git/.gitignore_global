@@ -33,3 +33,4 @@ AGENTS.md
 SPECIFICATIONS.md
 node_modules/
 __pycache__/
+.aic.toml
