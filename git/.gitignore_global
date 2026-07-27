@@ -31,6 +31,10 @@ pnpm-workspace.yaml
 .github/copilot-instructions.md
 AGENTS.md
 SPECIFICATIONS.md
+CLAUDE.md
 node_modules/
 __pycache__/
 .aic.toml
+.claude/settings.local.json
+.mcp.json
+
