@@ -80,8 +80,8 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-# plugins=( git zsh-autosuggestions fzf )
-plugins=( git zsh-autosuggestions fzf tirith )
+plugins=( git zsh-autosuggestions fzf )
+# plugins=( git zsh-autosuggestions fzf tirith )
 
 # Set custom location for zcompdump cache
 export ZSH_COMPDUMP="$HOME/.cache/zsh/.zcompdump-$HOST"
@@ -181,7 +181,8 @@ alias cl='clear'
 alias ter='(ptyxis --new-window --working-directory="$(pwd)" > /dev/null 2>&1 &)'
 alias exitcode='echo $?'
 alias csc='bananapy'
-alias dc="docker"
+alias d="docker"
+alias dc="docker compose"
 alias unit_tests_report="gcovr --exclude tests/ && gcovr -b --exclude tests/"
 alias count-project-lines="find . -type f -name \"*.c\" ! -path \"*/libs/*\" -print0 | xargs -0 wc -l"
 alias count-project-lines-with-libs="find . -type f -name \"*.c\" -print0 | xargs -0 wc -l"
@@ -190,6 +191,7 @@ alias complete-recent-discord-quest="cat ~/Documents/complete-recent-discord-que
 alias kctl="kubectl"
 alias end="notify-send --urgency=low 'Finished'"
 alias ag="antigravity"
+alias claude2='CLAUDE_CONFIG_DIR=~/.claude2 claude'
 
 # Others
 alias f="fuck"
@@ -223,9 +225,9 @@ export PATH="/home/enoal/my_scripts:$PATH"
 export LESS="-RFMiS --incsearch --use-color -j.5"
 
 # PyEnv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
@@ -246,17 +248,27 @@ case ":$PATH:" in
 esac
 
 # Nix
-. /home/enoal/.nix-profile/etc/profile.d/nix.sh
+# . /home/enoal/.nix-profile/etc/profile.d/nix.sh
 
 # Load secrets if the file exists
 [ -f "$HOME/.zshrc.secrets" ] && source "$HOME/.zshrc.secrets"
 
 # Homebrew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Tirith
 # eval "$(tirith init --shell zsh)"
 
 # Bun
-export BUN_INSTALL="$HOME/.bun" 
+export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Go
+export PATH=$PATH:/usr/local/go/bin
+
+# The Fuck
+eval $(thefuck --alias)
+
+# Resend CLI
+export PATH="$HOME/.resend/bin:$PATH"
