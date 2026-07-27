@@ -240,6 +240,9 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 export _ZO_ECHO=1
 eval "$(zoxide init zsh --cmd cd)"
 
+# TheFuck
+(( $+commands[thefuck] )) && eval "$(thefuck --alias)"
+
 # pnpm
 export PNPM_HOME="/home/enoal/.local/share/pnpm"
 case ":$PATH:" in
