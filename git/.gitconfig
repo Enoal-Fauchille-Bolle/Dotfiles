@@ -1,29 +1,41 @@
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
 [user]
-	name = Enoal Fauchille-Bolle
-	email = enoal.fauchille-bolle@epitech.eu
-	signingkey = /home/enoal/.ssh/id_ed25519.pub
+    name = Enoal Fauchille-Bolle
+    email = enoal.fauchille-bolle@epitech.eu
+    signingkey = /home/enoal/.ssh/id_ed25519.pub
 [core]
-	excludesfile = /home/enoal/.gitignore_global
+    excludesfile = /home/enoal/.gitignore_global
+    attributesfile = /home/enoal/.gitattributes
+    pager = delta
 [init]
-	defaultBranch = main
+    defaultBranch = main
 [commit]
-	gpgSign = true
+    gpgSign = true
 [tag]
-	forceSignAnnotated = true
+    forceSignAnnotated = true
 [gpg "ssh"]
-	program = ssh-keygen
+    program = ssh-keygen
 [gpg]
-	format = ssh
+    format = ssh
 [rerere]
-	enabled = true
+    enabled = true
 [credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+    helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+    helper = !/usr/bin/gh auth git-credential
+[diff "typescript"]
+    xfuncname = ^[ \\t]*((class|interface|function)[ \\t]+.*|((public|private|protected|static|async)[ \\t]+)*[a-zA-Z0-9_$]+\\(.*)$
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    dark = true      # or light = true, or omit for auto-detection
+
+[merge]
+    conflictStyle = zdiff3
