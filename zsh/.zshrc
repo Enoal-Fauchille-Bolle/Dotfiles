@@ -86,6 +86,11 @@ plugins=( git zsh-autosuggestions fzf )
 # Set custom location for zcompdump cache
 export ZSH_COMPDUMP="$HOME/.cache/zsh/.zcompdump-$HOST"
 
+# History size (must be set before oh-my-zsh.sh, which only raises these to its
+# own floors of 50000/10000 rather than overwriting them)
+HISTSIZE=100000
+SAVEHIST=100000
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
