@@ -1,0 +1,26 @@
+## Atuin configuration
+## Docs: https://docs.atuin.sh/cli/configuration/config
+
+# Insert the selected command on the prompt instead of running it straight away,
+# matching the `histverify` setopt already used in .zshrc
+enter_accept = false
+
+# Inline UI rather than fullscreen, closer to the fzf widget it replaces
+style = "compact"
+inline_height = 25
+
+# Commands matching any of these are never written to the database, so they are
+# never synced either. Unanchored, and using the regex crate syntax.
+# Belt and braces on top of the `histignorespace` setopt in .zshrc.
+history_filter = [
+  '(?i)(api[-_]?key|secret|token|password|passwd|credential)\s*[=:]\s*\S',
+  '(?i)authorization:\s*(bearer|basic)\s',
+  'gh[pousr]_[A-Za-z0-9]{16,}',
+  'sk-[A-Za-z0-9_-]{20,}',
+  'xox[baprs]-',
+  '^\s*atuin\s+(login|register|key)',
+]
+
+# Ctrl-R cycles through these, in this order
+[search]
+filters = ["global", "host", "session", "directory"]

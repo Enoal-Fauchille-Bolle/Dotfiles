@@ -12,6 +12,7 @@ PACKAGES=(
     ssh
     scripts
     nix
+    atuin
 )
 SECRETS_FILE="$HOME/.zshrc.secrets"
 

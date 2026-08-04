@@ -280,3 +280,8 @@ eval $(thefuck --alias)
 
 # Resend CLI
 export PATH="$HOME/.resend/bin:$PATH"
+
+# Atuin - binds ctrl-r, leaves the up arrow and the fzf ctrl-t/alt-c widgets alone.
+# --disable-ai drops the '?' binding, which sends prompts off to a third party.
+# Must stay after oh-my-zsh.sh so it can hook into zsh-autosuggestions.
+(( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow --disable-ai)"

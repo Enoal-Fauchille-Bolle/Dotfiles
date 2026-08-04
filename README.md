@@ -61,6 +61,7 @@ This project uses GNU Stow to manage packages. Each top-level directory represen
 
 ```text
 ~/Dotfiles
+├── atuin           # Shell history (SQLite backed, synced across machines)
 ├── clang-format    # Epitech C/C++ coding style
 ├── git             # Git global configuration and ignores
 ├── nix             # Nix package manager channels
@@ -95,6 +96,7 @@ export WAKATIME_API_KEY="your-private-wakatime-api-key"
 ## Included Configurations
 
 * **Shell:** Zsh with Oh My Zsh framework and Powerlevel10k theme.
+* **History:** Atuin, bound to `ctrl-r`. The up arrow keeps its native Zsh behaviour, and the fzf `ctrl-t` / `alt-c` widgets are untouched.
 * **Version Control:** Global Git configuration, standard ignores.
 * **Development:**
   * VS Code settings (user preferences, keybindings).
@@ -116,3 +118,16 @@ After running the install script, perform the following steps to finalize the se
     ```
 
 2. **SSH Keys:** Manually restore your private SSH keys (`id_rsa`) to `~/.ssh/` from a secure backup.
+
+3. **Atuin:** Install the binary, then hook the machine up to the synced history:
+
+    ```bash
+    cargo install atuin     # same version on every machine, unlike the distro packages
+    atuin import auto       # one-off, pulls in the existing ~/.zsh_history
+    atuin login -u <USERNAME>
+    atuin sync
+    ```
+
+    On a brand new machine, `atuin login` also asks for the encryption key. History is
+    end-to-end encrypted, so without that key the server has nothing readable to hand back.
+    Print it on an already-synced machine with `atuin key` and keep it in a password manager.
