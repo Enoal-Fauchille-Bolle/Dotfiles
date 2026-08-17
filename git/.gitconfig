@@ -4,13 +4,14 @@
     process = git-lfs filter-process
     required = true
 [user]
-    name = Enoal Fauchille-Bolle
-    email = enoal.fauchille-bolle@epitech.eu
+	name = Enoal Fauchille-Bolle
+	email = enoal.fauchille-bolle@epitech.eu
     signingkey = /home/enoal/.ssh/id_ed25519.pub
 [core]
     excludesfile = /home/enoal/.gitignore_global
     attributesfile = /home/enoal/.gitattributes
     pager = delta
+	editor = nano
 [init]
     defaultBranch = main
 [commit]
