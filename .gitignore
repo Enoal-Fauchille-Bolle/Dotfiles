@@ -1,3 +1,9 @@
 __pycache__/
 .DS_Store
 **/*.swp
+
+# The global excludes file ignores CLAUDE.md everywhere, which is right for a
+# project repository and wrong for this one: here it is the configuration being
+# shipped, not a generated instruction file. A repository .gitignore is read
+# after core.excludesFile, so this re-inclusion wins.
+!claude/.claude/CLAUDE.md

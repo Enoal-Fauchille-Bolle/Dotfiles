@@ -63,6 +63,7 @@ This project uses GNU Stow to manage packages. Each top-level directory represen
 ~/Dotfiles
 ├── atuin           # Shell history (SQLite backed, synced across machines)
 ├── clang-format    # Epitech C/C++ coding style
+├── claude          # Claude Code configuration
 ├── git             # Git global configuration and ignores
 ├── nix             # Nix package manager channels
 ├── npm             # NPM configuration and tokens
@@ -102,10 +103,30 @@ export WAKATIME_API_KEY="your-private-wakatime-api-key"
   * VS Code settings (user preferences, keybindings).
   * NPM configuration (registry settings).
   * Clang-format (Epitech C/C++ coding style).
+  * Claude Code: global instructions, status line, session budget guard, and the `/handoff` skill.
 * **System:**
   * Custom utility scripts added to `PATH`.
   * Nix channels configuration.
   * MIME type associations.
+
+### Claude Code session budget
+
+Claude cannot see how full its own context window is — no hook receives that
+number ([claude-code#27969](https://github.com/anthropics/claude-code/issues/27969)),
+so a rule telling it to warn past a threshold would be pure guesswork. The two
+files here close that gap by splitting the job in half:
+
+* `statusline-command.sh` is the **sensor**. The status line is the only
+  component handed live context, cost and rate-limit metrics, so it publishes
+  them to `~/.claude/state/ctx-<session>.txt` on every redraw.
+* `hooks/budget-guard.sh` is the **actuator**. It runs on `UserPromptSubmit` —
+  the only event whose stdout becomes context Claude can act on — reads that
+  state file, and falls back to summing the transcript's last assistant turn
+  when the status line has gone stale. Below every threshold it prints nothing,
+  so it costs no tokens on the vast majority of prompts.
+
+The thresholds it reports are named, never explained: what to do about each one
+lives in `CLAUDE.md`, which is re-injected from disk after every compaction.
 
 ## Post-Installation
 

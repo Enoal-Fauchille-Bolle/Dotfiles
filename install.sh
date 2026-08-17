@@ -13,6 +13,7 @@ PACKAGES=(
     scripts
     nix
     atuin
+    claude
 )
 SECRETS_FILE="$HOME/.zshrc.secrets"
 
