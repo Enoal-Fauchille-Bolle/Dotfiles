@@ -286,3 +286,6 @@ export PATH="$HOME/.resend/bin:$PATH"
 # --disable-ai drops the '?' binding, which sends prompts off to a third party.
 # Must stay after oh-my-zsh.sh so it can hook into zsh-autosuggestions.
 (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow --disable-ai)"
+
+# Generated for envman. Do not edit.
+[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
