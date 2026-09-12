@@ -16,6 +16,7 @@ PACKAGES=(
     claude
 )
 SECRETS_FILE="$HOME/.zshrc.secrets"
+WAKATIME_KEY_FILE="$HOME/.wakatime.key"
 
 # Function to detect OS and install stow
 install_stow() {
@@ -56,6 +57,17 @@ if [ ! -f "$SECRETS_FILE" ]; then
     echo "📝 REMINDER: Don't forget to fill $SECRETS_FILE with your actual tokens manually!"
 else
     echo "🔑 Secrets file already exists. Skipping."
+fi
+
+# 4. Setup WakaTime Key File (Local only)
+# .wakatime.cfg reads the key through api_key_vault_cmd, so the key itself never
+# lands in this repository. The file must hold the key alone, without comments.
+if [ ! -f "$WAKATIME_KEY_FILE" ]; then
+    echo "🔒 Creating empty WakaTime key file at $WAKATIME_KEY_FILE..."
+    (umask 077 && touch "$WAKATIME_KEY_FILE")
+    echo "📝 REMINDER: Paste your WakaTime API key (the key alone) into $WAKATIME_KEY_FILE!"
+else
+    echo "🔑 WakaTime key file already exists. Skipping."
 fi
 
 echo "✅ Done! Restart your shell."
