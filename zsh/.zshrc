@@ -262,8 +262,9 @@ esac
 # Load secrets if the file exists
 [ -f "$HOME/.zshrc.secrets" ] && source "$HOME/.zshrc.secrets"
 
-# Homebrew
-# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Homebrew - provides a git recent enough (>= 2.54) for the config-based hooks
+# declared in .gitconfig. Guarded so machines without Homebrew start cleanly.
+[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Tirith
 # eval "$(tirith init --shell zsh)"
