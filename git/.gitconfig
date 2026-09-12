@@ -40,3 +40,12 @@
 
 [merge]
     conflictStyle = zdiff3
+
+# Secret scan on every commit, in every repository. Config-based hooks need
+# git >= 2.54: older versions ignore this section silently. They run before the
+# repository's own hooks (.githooks, husky) instead of replacing them. Disable in
+# one repository with: git config hook.secrets.enabled false
+# Quoted because ';' starts a comment in git config files.
+[hook "secrets"]
+    event = pre-commit
+    command = "if command -v betterleaks >/dev/null 2>&1; then betterleaks git . --pre-commit --staged --no-banner --redact --verbose; else echo 'betterleaks not installed, skipping the secret scan' >&2; fi"
