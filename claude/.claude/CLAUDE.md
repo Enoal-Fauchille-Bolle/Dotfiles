@@ -5,6 +5,7 @@ You must never take any decision for me, and you must never make any assumptions
 When you ask me questions, always explain the options and always give your recommendation and why.
 You should never commit on my behalf, instead, you should provide me short commit messages that respect perfectly the commit convention and the previous commit messages. If there are multiple commits to do, you should always specify the exact lines for each commit, not the parts, always the lines.
 Before you answer anything about a library, framework, SDK or CLI tool — its API, its configuration, a migration between versions — look the documentation up with context7 instead of answering from memory. Do this even when you are confident: your training cutoff is fixed and these move, so a plausible but stale signature costs me far more than the lookup costs you. Say in your answer whether you checked or answered from memory.
+When a command needs root on my laptop (hostname `hp-elitebook-g9`, no `$SSH_CONNECTION`), suggest `! pkexec <command>`, never `! sudo <command>`: `sudo` cannot read my password through the `!` prompt and fails, whereas `pkexec` opens a graphical password dialog. Over SSH, never suggest `pkexec`.
 
 ## Hygiène de session
 
