@@ -46,7 +46,10 @@ cd "$DOTFILES_DIR" || exit
 for pkg in "${PACKAGES[@]}"; do
     if [ -d "$pkg" ]; then
         echo "🔗 Stowing $pkg..."
-        stow -R "$pkg" --adopt # -R ensures restow (refresh links), --adopt takes over existing files
+        # -R restows (refreshes links), --adopt takes over existing files,
+        # --no-folding links files one by one so directories such as ~/.local or
+        # ~/.claude stay real directories instead of links into this repository.
+        stow -R --adopt --no-folding "$pkg"
     else
         echo "⚠️  Warning: $pkg not found"
     fi
