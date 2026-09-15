@@ -1,0 +1,17 @@
+#!/bin/sh
+# Attrape-lien moodledl:// : reçoit l'URL du token SSO envoyée par le navigateur
+# (via xdg-open / le portail GNOME) et la met à disposition pour `moodle-dl --init --sso`.
+# Le token n'est jamais écrit sur le disque.
+
+url="$1"
+
+# Copie dans le presse-papiers Wayland.
+printf '%s' "$url" | wl-copy
+
+# Fenêtre de secours : le lien est affiché dans un champ sélectionnable
+# (Ctrl+A puis Ctrl+C) au cas où la copie automatique aurait échoué.
+zenity --entry \
+  --title="moodle-dl" \
+  --text="Lien du token copié dans le presse-papiers.\nColle-le dans le terminal moodle-dl avec Ctrl+Shift+V.\n\n(Secours : Ctrl+A puis Ctrl+C dans le champ ci-dessous.)" \
+  --entry-text="$url" \
+  --width=600 >/dev/null 2>&1
