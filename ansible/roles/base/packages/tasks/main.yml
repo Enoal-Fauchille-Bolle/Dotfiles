@@ -1,0 +1,21 @@
+- name: Install Debian packages
+  ansible.builtin.apt:
+    name: "{{ apt_packages_shell + apt_packages_dev + apt_packages_tex + apt_packages_desktop }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+- name: Install packages from third-party repositories
+  ansible.builtin.apt:
+    name: "{{ apt_packages_third_party }}"
+    state: present
+  become: true
+
+- name: Install upstream .deb packages that no repository provides
+  ansible.builtin.apt:
+    deb: "{{ item }}"
+  loop: "{{ apt_debs }}"
+  loop_control:
+    label: "{{ item | basename }}"
+  become: true

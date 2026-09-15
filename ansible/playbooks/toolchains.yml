@@ -1,0 +1,44 @@
+- name: Rust
+  hosts: all
+  roles:
+    - { role: toolchains/rust, tags: [toolchains, rust] }
+
+- name: Node
+  hosts: all
+  roles:
+    - { role: toolchains/node, tags: [toolchains, node] }
+
+- name: Bun
+  hosts: all
+  roles:
+    - { role: toolchains/bun, tags: [toolchains, bun] }
+
+- name: Homebrew
+  hosts: all
+  roles:
+    - { role: toolchains/homebrew, tags: [toolchains, homebrew] }
+
+- name: Python user tools
+  hosts: all
+  roles:
+    - { role: toolchains/python, tags: [toolchains, python] }
+
+- name: Kubernetes clients
+  hosts: all
+  roles:
+    - { role: toolchains/kubernetes, tags: [toolchains, kubernetes] }
+
+- name: Standalone tools
+  hosts: all
+  roles:
+    - { role: toolchains/tools, tags: [toolchains, tools] }
+
+- name: Claude Code
+  hosts: all
+  roles:
+    - { role: toolchains/claude, tags: [toolchains, claude] }
+
+- name: GitKraken
+  hosts: all
+  roles:
+    - { role: toolchains/gitkraken, tags: [toolchains, gitkraken] }

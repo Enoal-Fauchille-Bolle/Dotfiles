@@ -1,0 +1,16 @@
+- name: Install sshm (SSH connection manager)
+  ansible.builtin.unarchive:
+    src: "https://github.com/Gu1llaum-3/sshm/releases/download/{{ sshm_version }}/sshm_Linux_x86_64.tar.gz"
+    dest: /usr/local/bin
+    remote_src: yes
+    include: [sshm]
+    creates: /usr/local/bin/sshm
+    mode: '0755'
+  become: true
+
+- name: Install QDiskInfo (disk health GUI)
+  ansible.builtin.get_url:
+    url: "https://github.com/edisionnano/QDiskInfo/releases/download/{{ qdiskinfo_version }}/QDiskInfo_X86_64"
+    dest: /usr/local/bin/QDiskInfo
+    mode: '0755'
+  become: true

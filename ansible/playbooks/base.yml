@@ -1,0 +1,19 @@
+- name: Third-party apt repositories
+  hosts: all
+  roles:
+    - { role: base/repos, tags: [base, repos] }
+
+- name: Install packages
+  hosts: all
+  roles:
+    - { role: base/packages, tags: [base, packages] }
+
+- name: System settings
+  hosts: all
+  roles:
+    - { role: base/system, tags: [base, system] }
+
+- name: Setup user
+  hosts: all
+  roles:
+    - { role: base/user, tags: [base, user] }

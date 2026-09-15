@@ -1,0 +1,23 @@
+- name: Install rustup with the stable toolchain
+  ansible.builtin.shell: |
+    curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile default --default-toolchain stable
+  args:
+    creates: "{{ user_home }}/.cargo/bin/rustup"
+
+- name: List installed rustup components
+  ansible.builtin.command: "{{ user_home }}/.cargo/bin/rustup component list --installed"
+  register: rust_installed
+  changed_when: false
+
+- name: Add extra rustup components
+  ansible.builtin.command: "{{ user_home }}/.cargo/bin/rustup component add {{ item }}"
+  loop: "{{ rust_components }}"
+  when: rust_installed.stdout_lines | select('match', '^' + item + '(-|$)') | list | length == 0
+
+- name: Install crates with cargo
+  ansible.builtin.command: "{{ user_home }}/.cargo/bin/cargo install --locked {{ item.crate }}"
+  args:
+    creates: "{{ user_home }}/.cargo/bin/{{ item.bin }}"
+  loop: "{{ cargo_crates }}"
+  loop_control:
+    label: "{{ item.crate }}"

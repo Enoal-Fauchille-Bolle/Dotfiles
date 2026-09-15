@@ -1,0 +1,29 @@
+- name: Clone Oh My Zsh
+  ansible.builtin.git:
+    repo: "{{ ohmyzsh_repo }}"
+    dest: "{{ user_home }}/.oh-my-zsh"
+    depth: 1
+    update: no
+  tags: [omz]
+
+- name: Clone Oh My Zsh custom plugins
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ user_home }}/.oh-my-zsh/custom/plugins/{{ item.name }}"
+    depth: 1
+    update: no
+  loop: "{{ ohmyzsh_plugins }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: [omz]
+
+- name: Clone Oh My Zsh custom themes
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ user_home }}/.oh-my-zsh/custom/themes/{{ item.name }}"
+    depth: 1
+    update: no
+  loop: "{{ ohmyzsh_themes }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: [p10k]

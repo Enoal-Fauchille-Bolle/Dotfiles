@@ -1,0 +1,13 @@
+- name: Reload sysctl
+  ansible.builtin.command: sysctl --system
+  when: not (is_container | bool)
+  become: true
+
+- name: Reload udev
+  ansible.builtin.command: udevadm control --reload
+  when: not (is_container | bool)
+  become: true
+
+- name: Update GRUB
+  ansible.builtin.command: update-grub
+  become: true

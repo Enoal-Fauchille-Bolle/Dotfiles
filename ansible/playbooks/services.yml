@@ -1,0 +1,9 @@
+- name: Ollama
+  hosts: all
+  roles:
+    - { role: services/ollama, tags: [services, ollama] }
+
+- name: User systemd units
+  hosts: all
+  roles:
+    - { role: services/user_units, tags: [services, user_units] }

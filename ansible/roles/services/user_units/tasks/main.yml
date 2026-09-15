@@ -1,0 +1,38 @@
+# The unit files come from the `systemd` stow package (install.sh); this role
+# only enables them. A user manager must be running: it is on a desktop
+# session, and lingering provides one in test containers.
+
+- name: Start a user manager without a login session (containers only)
+  ansible.builtin.command: "loginctl enable-linger {{ user_name }}"
+  args:
+    creates: "/var/lib/systemd/linger/{{ user_name }}"
+  become: true
+  when: is_container | bool
+
+- name: Enable the user units
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    scope: user
+    enabled: yes
+    daemon_reload: yes
+  loop: "{{ systemd_user_units_enabled }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+    DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ ansible_user_uid }}/bus"
+
+- name: Create the battery notifier config directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/battery-discord"
+    state: directory
+    mode: '0700'
+
+- name: Create an empty battery notifier config (fill WEBHOOK_URL by hand)
+  ansible.builtin.copy:
+    dest: "{{ user_home }}/.config/battery-discord/config"
+    content: |
+      # Sourced by battery-discord-notify.sh. Keep this file out of any repository.
+      # WEBHOOK_URL='https://discord.com/api/webhooks/...'
+      # LOW=20
+      # CRITICAL=10
+    mode: '0600'
+    force: no

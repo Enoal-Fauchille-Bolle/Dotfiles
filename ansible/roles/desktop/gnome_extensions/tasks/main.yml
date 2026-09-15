@@ -1,0 +1,59 @@
+# Extensions are fetched from extensions.gnome.org for the running GNOME
+# Shell version and unpacked where a manual install would put them. They
+# become active after the next login; enabling them is done by the dconf role.
+
+- name: Read the GNOME Shell version
+  ansible.builtin.shell: gnome-shell --version | grep -oE '[0-9]+' | head -1
+  register: gnome_shell_detected
+  changed_when: false
+  failed_when: false
+
+- name: Pick the shell version used for downloads
+  ansible.builtin.set_fact:
+    gnome_shell_version: "{{ gnome_shell_detected.stdout if gnome_shell_detected.stdout | length > 0 else gnome_shell_version_fallback }}"
+    gnome_ext_dir: "{{ user_home }}/.local/share/gnome-shell/extensions"
+
+- name: Check which extensions are already installed
+  ansible.builtin.stat:
+    path: "{{ gnome_ext_dir }}/{{ item }}/metadata.json"
+  loop: "{{ gnome_extensions }}"
+  register: gnome_ext_stat
+
+- name: Set the list of missing extensions
+  ansible.builtin.set_fact:
+    gnome_extensions_missing: "{{ gnome_ext_stat.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
+
+- name: Query extensions.gnome.org for a build matching GNOME {{ gnome_shell_version }}
+  ansible.builtin.uri:
+    url: "https://extensions.gnome.org/extension-info/?uuid={{ item }}&shell_version={{ gnome_shell_version }}"
+    return_content: yes
+  loop: "{{ gnome_extensions_missing }}"
+  register: gnome_ext_info
+
+- name: Create the extension directories
+  ansible.builtin.file:
+    path: "{{ gnome_ext_dir }}/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ gnome_extensions_missing }}"
+
+- name: Download and unpack the extensions
+  ansible.builtin.unarchive:
+    src: "https://extensions.gnome.org{{ item.json.download_url }}"
+    dest: "{{ gnome_ext_dir }}/{{ item.item }}"
+    remote_src: yes
+    creates: "{{ gnome_ext_dir }}/{{ item.item }}/metadata.json"
+  loop: "{{ gnome_ext_info.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Compile the settings schemas that ship uncompiled
+  ansible.builtin.shell: |
+    for uuid in {{ gnome_extensions | join(' ') }}; do
+      dir="{{ gnome_ext_dir }}/$uuid/schemas"
+      if [ -d "$dir" ] && ls "$dir"/*.gschema.xml >/dev/null 2>&1 && [ ! -f "$dir/gschemas.compiled" ]; then
+        glib-compile-schemas "$dir" && echo "compiled $uuid"
+      fi
+    done
+  register: gnome_ext_schemas
+  changed_when: "'compiled' in gnome_ext_schemas.stdout"

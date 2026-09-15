@@ -1,0 +1,14 @@
+dconf_files:
+  - { path: /org/gnome/desktop/interface/, file: desktop-interface.ini }
+  - { path: /org/gnome/desktop/wm/keybindings/, file: wm-keybindings.ini }
+  - { path: /org/gnome/desktop/wm/preferences/, file: wm-preferences.ini }
+  - { path: /org/gnome/settings-daemon/plugins/media-keys/, file: media-keys.ini }
+  - { path: /org/gnome/desktop/peripherals/, file: peripherals.ini }
+  - { path: /org/gnome/desktop/input-sources/, file: input-sources.ini }
+  - { path: /org/gnome/desktop/session/, file: session.ini }
+  - { path: /org/gnome/settings-daemon/plugins/power/, file: power.ini }
+  - { path: /org/gnome/mutter/, file: mutter.ini }
+  - { path: /org/gnome/Ptyxis/, file: ptyxis.ini }
+  - { path: /org/gnome/nautilus/, file: nautilus.ini }
+  - { path: /org/gtk/, file: gtk.ini }
+  - { path: /org/gnome/shell/, file: shell.ini }

@@ -1,0 +1,31 @@
+- name: Install Claude Code (native installer)
+  ansible.builtin.shell: |
+    curl -fsSL https://claude.ai/install.sh | bash
+  args:
+    creates: "{{ user_home }}/.local/bin/claude"
+
+- name: List known plugin marketplaces
+  ansible.builtin.command: "{{ user_home }}/.local/bin/claude plugin marketplace list"
+  register: claude_marketplace_list
+  changed_when: false
+  failed_when: false
+
+- name: Add plugin marketplaces
+  ansible.builtin.command: "{{ user_home }}/.local/bin/claude plugin marketplace add {{ item }}"
+  loop: "{{ claude_marketplaces }}"
+  when: item not in claude_marketplace_list.stdout
+
+- name: Read the installed plugin list
+  ansible.builtin.slurp:
+    src: "{{ user_home }}/.claude/plugins/installed_plugins.json"
+  register: claude_installed_raw
+  failed_when: false
+
+- name: Install plugins
+  ansible.builtin.command: "{{ user_home }}/.local/bin/claude plugin install {{ item }}"
+  loop: "{{ claude_plugins }}"
+  vars:
+    claude_installed: >-
+      {{ (claude_installed_raw.content | default('') | b64decode | from_json).plugins | default({})
+         if claude_installed_raw.content is defined else {} }}
+  when: item not in claude_installed

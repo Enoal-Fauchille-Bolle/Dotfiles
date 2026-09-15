@@ -1,0 +1,50 @@
+#################################### nvm ####################################
+# PROFILE=/dev/null keeps the installer from appending to .zshrc, which
+# already sources nvm.
+
+- name: Install nvm
+  ansible.builtin.shell: |
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | PROFILE=/dev/null bash
+  args:
+    creates: "{{ user_home }}/.nvm/nvm.sh"
+
+- name: Check whether Node {{ node_version }} is installed
+  ansible.builtin.shell: |
+    . "{{ user_home }}/.nvm/nvm.sh" && nvm version {{ node_version }}
+  args:
+    executable: /bin/bash
+  register: node_present
+  changed_when: false
+  failed_when: false
+
+- name: Install Node {{ node_version }} and make it the default
+  ansible.builtin.shell: |
+    . "{{ user_home }}/.nvm/nvm.sh" && nvm install {{ node_version }} && nvm alias default {{ node_version }}
+  args:
+    executable: /bin/bash
+  when: node_present.stdout == 'N/A'
+
+- name: Read the default Node alias
+  ansible.builtin.command: cat "{{ user_home }}/.nvm/alias/default"
+  register: node_default
+  changed_when: false
+  failed_when: false
+
+- name: Point the default alias at Node {{ node_version }}
+  ansible.builtin.shell: |
+    . "{{ user_home }}/.nvm/nvm.sh" && nvm alias default {{ node_version }}
+  args:
+    executable: /bin/bash
+  when: node_default.stdout != node_version
+
+#################################### pnpm ###################################
+# SHELL=/bin/sh: the installer only edits rc files for shells it knows, and
+# .zshrc already exports PNPM_HOME.
+
+- name: Install pnpm (standalone)
+  ansible.builtin.shell: |
+    curl -fsSL https://get.pnpm.io/install.sh | PNPM_VERSION={{ pnpm_version }} SHELL=/bin/sh ENV=/dev/null sh -
+  args:
+    creates: "{{ user_home }}/.local/share/pnpm/bin/pnpm"
+  environment:
+    PNPM_HOME: "{{ user_home }}/.local/share/pnpm"

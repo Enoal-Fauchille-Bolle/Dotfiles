@@ -1,0 +1,37 @@
+# The stow package list lives in install.sh only. The script is re-run when
+# stow reports a link to create (dry run) or when a local-only file it
+# creates is missing, so a second run changes nothing.
+
+- name: Read the stow package list from install.sh
+  ansible.builtin.shell: |
+    set -e
+    eval "$(sed -n '/^PACKAGES=(/,/^)/p' install.sh)"
+    echo "${PACKAGES[@]}"
+  args:
+    chdir: "{{ dotfiles_dir }}"
+    executable: /bin/bash
+  register: stow_packages
+  changed_when: false
+
+- name: Ask stow which links are still missing (dry run)
+  ansible.builtin.shell: |
+    stow -n -v {{ stow_packages.stdout }} 2>&1 | grep -E '^(LINK|UNLINK|MKDIR|CONFLICT)' || true
+  args:
+    chdir: "{{ dotfiles_dir }}"
+  register: stow_pending
+  changed_when: false
+
+- name: Check the local-only files install.sh creates
+  ansible.builtin.stat:
+    path: "{{ user_home }}/{{ item }}"
+  loop:
+    - .zshrc.secrets
+    - .wakatime.key
+  register: local_files
+
+- name: Run install.sh (stow links and empty secret files)
+  ansible.builtin.command: ./install.sh
+  args:
+    chdir: "{{ dotfiles_dir }}"
+  when: stow_pending.stdout | length > 0
+        or local_files.results | rejectattr('stat.exists') | list | length > 0

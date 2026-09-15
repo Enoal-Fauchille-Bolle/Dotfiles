@@ -1,0 +1,38 @@
+- name: Add Flatpak remotes
+  community.general.flatpak_remote:
+    name: "{{ item.name }}"
+    flatpakrepo_url: "{{ item.url }}"
+    method: system
+    state: present
+  loop: "{{ flatpak_remotes }}"
+  loop_control:
+    label: "{{ item.name }}"
+  become: true
+
+- name: Install Flatpak applications
+  community.general.flatpak:
+    name: "{{ item.apps }}"
+    remote: "{{ item.remote }}"
+    method: system
+    state: present
+  loop: "{{ flatpak_apps }}"
+  loop_control:
+    label: "{{ item.remote }}"
+  become: true
+  tags: [flatpak_apps]
+
+- name: Read current per-user sandbox overrides
+  ansible.builtin.command: "flatpak override --user --show {{ item.app }}"
+  loop: "{{ flatpak_overrides }}"
+  loop_control:
+    label: "{{ item.app }}"
+  register: flatpak_override_current
+  changed_when: false
+  failed_when: false
+
+- name: Apply per-user sandbox overrides
+  ansible.builtin.command: "flatpak override --user {{ item.item.app }} {{ item.item.option }}"
+  loop: "{{ flatpak_override_current.results }}"
+  loop_control:
+    label: "{{ item.item.app }} {{ item.item.option }}"
+  when: item.item.option.split('=')[1] not in item.stdout

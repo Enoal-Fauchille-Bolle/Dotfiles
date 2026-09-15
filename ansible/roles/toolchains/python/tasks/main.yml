@@ -1,0 +1,7 @@
+# Debian marks its Python as externally managed (PEP 668); user-level
+# installs need the explicit override, as done by hand on the laptop.
+- name: Install user-level Python tools
+  ansible.builtin.pip:
+    name: "{{ pip_user_packages }}"
+    executable: pip3
+    extra_args: --user --break-system-packages

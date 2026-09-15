@@ -1,0 +1,95 @@
+- name: Install what apt needs to talk to HTTPS repositories
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - xz-utils
+      - python3-debian
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
+# Debian sources: firmware packages need the non-free-firmware component,
+# which the installer only adds when it needed firmware itself. Both the
+# deb822 file (debian.sources) and the classic sources.list are handled.
+- name: Enable non-free-firmware in debian.sources
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/debian.sources
+    regexp: '^(Components:.*\bmain\b)(?!.*non-free-firmware)(.*)$'
+    replace: '\1 non-free-firmware\2'
+  register: apt_debian_sources
+  failed_when: apt_debian_sources.failed and 'does not exist' not in apt_debian_sources.msg
+  become: true
+
+- name: Enable non-free-firmware in sources.list
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: '^(deb\s+\S+\s+\S+\s+main)(?!.*non-free-firmware)(.*)$'
+    replace: '\1 non-free-firmware\2'
+  register: apt_sources_list
+  failed_when: apt_sources_list.failed and 'does not exist' not in apt_sources_list.msg
+  become: true
+
+- name: Create the apt keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+
+# Same path as the one the claude-desktop package writes, so apt never sees
+# two different Signed-By values for that repository.
+- name: Install the Claude Desktop signing key (no public URL for it)
+  ansible.builtin.copy:
+    src: claude-desktop.asc
+    dest: /usr/share/keyrings/claude-desktop-archive-keyring.asc
+    mode: '0644'
+  become: true
+
+# The claude-desktop package adds its own repository file on install and on
+# every upgrade unless told not to; the deb822 entry below is the only one.
+- name: Tell the claude-desktop package not to manage its apt source
+  ansible.builtin.copy:
+    dest: /etc/default/claude-desktop
+    content: |
+      CLAUDE_DESKTOP_ADD_REPO="false"
+    mode: '0644'
+  become: true
+
+- name: Add third-party apt repositories (deb822 format)
+  ansible.builtin.deb822_repository:
+    name: "{{ item.name }}"
+    types: deb
+    uris: "{{ item.uris }}"
+    suites: "{{ item.suites }}"
+    components: "{{ item.components }}"
+    architectures: amd64
+    signed_by: "{{ item.signed_by }}"
+    state: present
+  loop: "{{ apt_repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: apt_repos
+  become: true
+
+# Files written by the hand-made setup or by vendor installers, in the old
+# one-line format. Left in place they would duplicate the entries above.
+- name: Remove legacy one-line repository files
+  ansible.builtin.file:
+    path: "/etc/apt/sources.list.d/{{ item }}"
+    state: absent
+  loop:
+    - claude-desktop.list
+    - github-cli.list
+    - tailscale.list
+  register: apt_legacy
+  become: true
+
+- name: Refresh the apt cache after a repository change
+  ansible.builtin.apt:
+    update_cache: yes
+  when: apt_repos.changed or apt_legacy.changed
+        or apt_debian_sources.changed | default(false) or apt_sources_list.changed | default(false)
+  become: true

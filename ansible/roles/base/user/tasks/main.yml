@@ -1,0 +1,13 @@
+# Some groups only exist once their package is installed (netdev, bluetooth,
+# lpadmin, scanner); the user is added to those that exist on this machine.
+- name: List the groups present on this machine
+  ansible.builtin.getent:
+    database: group
+
+- name: Add the user to its groups and switch the login shell to Zsh
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: "{{ user_groups | select('in', ansible_facts.getent_group.keys() | list) | list }}"
+    append: yes
+    shell: /usr/bin/zsh
+  become: true

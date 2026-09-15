@@ -1,0 +1,9 @@
+- name: Configure Zsh
+  hosts: all
+  roles:
+    - { role: shell/zsh, tags: [shell, zsh] }
+
+- name: Link the dotfiles
+  hosts: all
+  roles:
+    - { role: shell/dotfiles, tags: [shell, dotfiles] }

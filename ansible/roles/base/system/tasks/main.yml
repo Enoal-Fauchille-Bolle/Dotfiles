@@ -1,0 +1,104 @@
+################################### Locale ###################################
+
+- name: Generate the system locale
+  community.general.locale_gen:
+    name: "{{ system_locale }}"
+    state: present
+  become: true
+  tags: [locale]
+
+- name: Set the default locale
+  ansible.builtin.copy:
+    dest: /etc/default/locale
+    content: |
+      LANG={{ system_locale }}
+      LANGUAGE={{ system_locale.split('.')[0] }}:{{ system_locale.split('_')[0] }}
+    mode: '0644'
+  become: true
+  tags: [locale]
+
+- name: Set the timezone
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+  become: true
+  tags: [locale]
+
+################################## Keyboard ##################################
+
+- name: Set the console keyboard layout
+  ansible.builtin.lineinfile:
+    path: /etc/default/keyboard
+    regexp: "^{{ item.key }}="
+    line: '{{ item.key }}="{{ item.value }}"'
+    create: yes
+    mode: '0644'
+  loop:
+    - { key: XKBLAYOUT, value: "{{ keyboard_layout }}" }
+    - { key: XKBVARIANT, value: "{{ keyboard_variant }}" }
+  become: true
+  tags: [keyboard]
+
+################################### logind ###################################
+
+- name: Lock the session when the lid closes
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/logind.conf
+    regexp: '^#?HandleLidSwitch='
+    line: "HandleLidSwitch={{ logind_handle_lid_switch }}"
+    insertafter: '^\[Login\]'
+  become: true
+  tags: [logind]
+
+################################### sysctl ###################################
+
+- name: Raise the inotify instance limit (IDE and file watchers)
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/90-inotify.conf
+    content: "fs.inotify.max_user_instances = {{ sysctl_inotify_max_user_instances }}\n"
+    mode: '0644'
+  notify: Reload sysctl
+  become: true
+  tags: [sysctl]
+
+#################################### udev ####################################
+
+- name: Grant MTP access to the OnePlus 10T
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/51-oneplus-10t-mtp.rules
+    content: >-
+      SUBSYSTEM=="usb", ATTR{idVendor}=="22d9", ATTR{idProduct}=="2766",
+      MODE="0664", GROUP="plugdev", TAG+="uaccess",
+      ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
+    mode: '0644'
+  notify: Reload udev
+  become: true
+  tags: [udev]
+
+#################################### GRUB ####################################
+# Skipped in containers: there is no bootloader to update.
+
+- name: Set GRUB kernel parameters and the keyboard driver for the menu
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: "^#?{{ item.key }}="
+    line: '{{ item.key }}="{{ item.value }}"'
+  loop:
+    - { key: GRUB_CMDLINE_LINUX_DEFAULT, value: "{{ grub_cmdline_linux_default }}" }
+    - { key: GRUB_TERMINAL_INPUT, value: at_keyboard }
+    - { key: GRUB_PRELOAD_MODULES, value: at_keyboard keylayouts }
+  notify: Update GRUB
+  when: not (is_container | bool)
+  become: true
+  tags: [grub]
+
+- name: Use the French keymap in the GRUB menu
+  ansible.builtin.blockinfile:
+    path: /etc/grub.d/40_custom
+    block: |
+      insmod keylayouts
+      keymap {{ keyboard_layout }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (Dotfiles)"
+  notify: Update GRUB
+  when: not (is_container | bool)
+  become: true
+  tags: [grub]

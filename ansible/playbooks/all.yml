@@ -1,0 +1,5 @@
+- import_playbook: base.yml
+- import_playbook: shell.yml
+- import_playbook: toolchains.yml
+- import_playbook: desktop.yml
+- import_playbook: services.yml

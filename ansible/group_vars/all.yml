@@ -1,0 +1,306 @@
+# Variables shared by every play. Removing an entry from a list only stops
+# installing it on the next rebuild; nothing is ever uninstalled.
+
+user_name: "{{ ansible_user_id }}"
+user_home: "{{ ansible_env.HOME }}"
+dotfiles_dir: "{{ user_home }}/Dotfiles"
+
+# True inside a Docker/Podman/LXC test container. Skips what only makes sense
+# on real hardware (GRUB, udev, sysctl) or needs a running session.
+is_container: >-
+  {{ ansible_virtualization_role | default('') == 'guest'
+     and ansible_virtualization_type | default('') in ['docker', 'container', 'podman', 'lxc'] }}
+
+#################################### apt ####################################
+
+apt_packages_shell:
+  - zsh
+  - zsh-syntax-highlighting
+  - fzf
+  - eza
+  - zoxide
+  - thefuck
+  - htop
+  - btop
+  - fastfetch
+  - vim
+  - tree
+  - jq
+  - curl
+  - git
+  - rsync
+  - zip
+  - unzip
+  - zstd
+  - xclip
+  - wl-clipboard
+  - stow
+  - gnupg
+  - netcat-traditional
+  - nmap
+  - usbutils
+  - lshw
+  - smartmontools
+  - gsmartcontrol
+  - evtest
+  - acpica-tools
+  - adb
+  - mtp-tools
+  - rclone
+  - locales
+
+apt_packages_dev:
+  - build-essential
+  - cmake
+  - pkg-config
+  - valgrind
+  - gcovr
+  - libssl-dev
+  - python3-dev
+  - python3-pip
+  - python3-venv
+  - python3-setuptools
+  - python3-evdev
+  - libxkbcommon-dev
+  - libgl1-mesa-dev
+  - qt6-base-dev
+  - qt6-tools-dev
+  - qt6-tools-dev-tools
+  - qt6-wayland
+  - gir1.2-gtk-4.0
+  - python3-nautilus
+
+apt_packages_tex:
+  - texlive-base
+  - texlive-binaries
+  - texlive-latex-base
+  - texlive-latex-recommended
+  - texlive-latex-extra
+  - texlive-fonts-recommended
+  - texlive-pictures
+  - texlive-plain-generic
+  - texlive-bibtex-extra
+  - biber
+  - latexmk
+
+apt_packages_desktop:
+  - ptyxis
+  - gparted
+  - freerdp3-x11
+  - flatpak
+  - gnome-software-plugin-flatpak
+  - podman
+  - systemd-oomd
+  - systemd-zram-generator
+  - firmware-sof-signed
+  - firmware-amd-graphics
+  - dconf-cli
+  - fontconfig
+  - zenity
+
+# Third-party repositories, written in deb822 format under
+# /etc/apt/sources.list.d/<name>.sources. signed_by is a URL, except for
+# Claude Desktop whose key has no public URL: it is shipped in
+# roles/base/repos/files.
+apt_repositories:
+  - name: docker
+    uris: https://download.docker.com/linux/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    signed_by: https://download.docker.com/linux/debian/gpg
+  - name: tailscale
+    uris: https://pkgs.tailscale.com/stable/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    signed_by: "https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg"
+  - name: vscode
+    uris: https://packages.microsoft.com/repos/code
+    suites: stable
+    components: main
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+  - name: github-cli
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+  - name: claude-desktop
+    uris: https://downloads.claude.ai/claude-desktop/apt/stable
+    suites: stable
+    components: main
+    signed_by: /usr/share/keyrings/claude-desktop-archive-keyring.asc
+
+apt_packages_third_party:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+  - tailscale
+  - code
+  - gh
+  - claude-desktop
+
+# Packages that exist in no repository: installed from an upstream .deb.
+apt_debs:
+  - https://github.com/sezanzeb/input-remapper/releases/download/2.2.1/input-remapper-2.2.1.deb
+  - https://github.com/JonMagon/KDiskMark/releases/download/3.3.0/kdiskmark_3.3.0_amd64.deb
+
+################################## system ###################################
+
+system_locale: en_US.UTF-8
+system_timezone: Europe/Paris
+keyboard_layout: fr
+keyboard_variant: latin9
+logind_handle_lid_switch: lock
+sysctl_inotify_max_user_instances: 1024
+grub_cmdline_linux_default: "quiet usb-storage.quirks=0bc2:231a:u,152d:0580:u"
+
+user_groups:
+  - sudo
+  - docker
+  - input
+  - plugdev
+  - netdev
+  - bluetooth
+  - lpadmin
+  - scanner
+
+################################### shell ###################################
+
+ohmyzsh_repo: https://github.com/ohmyzsh/ohmyzsh.git
+ohmyzsh_plugins:
+  - name: zsh-autosuggestions
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+ohmyzsh_themes:
+  - name: powerlevel10k
+    repo: https://github.com/romkatv/powerlevel10k.git
+
+################################ toolchains #################################
+
+rust_components:
+  - rust-src
+cargo_crates:
+  - { crate: atuin, bin: atuin }
+  - { crate: git-delta, bin: delta }
+  - { crate: cargo-tarpaulin, bin: cargo-tarpaulin }
+
+nvm_version: v0.40.6
+node_version: "24"
+pnpm_version: 11.17.0
+bun_version: 1.3.14
+
+homebrew_prefix: /home/linuxbrew/.linuxbrew
+homebrew_formulae:
+  - git
+  - betterleaks
+  - trufflehog
+# Brew binaries exposed system-wide, as on the laptop today.
+homebrew_system_links:
+  - git
+  - betterleaks
+
+pip_user_packages:
+  - diff-cover
+  - Pygments
+
+kubectl_version: v1.36.3
+helm_version: v4.2.4
+k9s_version: v0.51.0
+
+sshm_version: v1.11.0
+qdiskinfo_version: "0.4"
+
+claude_marketplaces:
+  - anthropics/claude-plugins-official
+  - https://github.com/wakatime/claude-code-wakatime.git
+claude_plugins:
+  - claude-code-wakatime@wakatime
+  - code-review@claude-plugins-official
+  - code-simplifier@claude-plugins-official
+  - context7@claude-plugins-official
+  - explanatory-output-style@claude-plugins-official
+  - feature-dev@claude-plugins-official
+  - frontend-design@claude-plugins-official
+  - github@claude-plugins-official
+  - gitlab@claude-plugins-official
+  - rust-analyzer-lsp@claude-plugins-official
+  - superpowers@claude-plugins-official
+  - typescript-lsp@claude-plugins-official
+
+gitkraken_version: 11.1.1
+ollama_version: 0.34.0
+
+################################## desktop ##################################
+
+flatpak_remotes:
+  - name: flathub
+    url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  - name: flathub-beta
+    url: https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo
+
+flatpak_apps:
+  - remote: flathub
+    apps:
+      - com.anydesk.Anydesk
+      - com.bitwarden.desktop
+      - com.brave.Browser
+      - com.discordapp.Discord
+      - com.github.ADBeveridge.Raider
+      - com.github.IsmaelMartinez.teams_for_linux
+      - com.google.Chrome
+      - com.mattjakeman.ExtensionManager
+      - com.protonvpn.www
+      - com.termius.Termius
+      - dev.vencord.Vesktop
+      - md.obsidian.Obsidian
+      - net.nokyan.Resources
+      - nl.hjdskes.gcolor3
+      - org.audacityteam.Audacity
+      - org.gnome.Extensions
+      - org.gnome.World.PikaBackup
+      - org.kde.krita
+      - org.libreoffice.LibreOffice
+      - org.localsend.localsend_app
+      - org.prismlauncher.PrismLauncher
+      - org.videolan.VLC
+      - page.tesk.Refine
+  - remote: flathub-beta
+    apps:
+      - com.discordapp.DiscordCanary
+
+# Per-user sandbox overrides (flatpak override --user).
+flatpak_overrides:
+  - app: com.google.Chrome
+    option: "--filesystem={{ user_home }}:ro"
+
+# Used to pick a compatible build on extensions.gnome.org when gnome-shell is
+# not installed on the machine running the playbook (test containers).
+gnome_shell_version_fallback: "48"
+gnome_extensions:
+  - monitor@astraext.github.io
+  - Bluetooth-Battery-Meter@maniacx.github.com
+  - blur-my-shell@aunetx
+  - burn-my-windows@schneegans.github.com
+  - claude-code-usage@haletran.com
+  - clipboard-indicator@tudmotu.com
+  - dash-to-dock@micxgx.gmail.com
+  - emoji-copy@felipeftn
+  - gsconnect@andyholmes.github.io
+  - IP-Finder@linxgem33.com
+  - lan-ip-address@mrhuber.com
+  - nightthemeswitcher@romainvigier.fr
+  - notification-configurator@exposedcat
+  - steal-my-focus-window@steal-my-focus-window
+  - vscode-search-provider@mrmarble.github.com
+  - weatherornot@somepaulo.github.io
+  - top-bar-organizer@julian.gse.jsts.xyz
+
+nerd_fonts_version: v3.4.0
+nerd_fonts_archives:
+  - DroidSansMono
+
+################################# services ##################################
+
+systemd_user_units_enabled:
+  - sniper-mouse.service
+  - battery-discord.timer

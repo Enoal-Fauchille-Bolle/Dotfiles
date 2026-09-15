@@ -1,0 +1,33 @@
+# The prefix is created as root and handed to the user first, so the
+# installer never needs sudo (it would prompt for a password without a tty).
+- name: Create the Homebrew prefix owned by the user
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0755'
+  loop:
+    - "{{ homebrew_prefix | dirname }}"
+    - "{{ homebrew_prefix }}"
+  become: true
+
+- name: Install Homebrew
+  ansible.builtin.shell: |
+    NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    creates: "{{ homebrew_prefix }}/bin/brew"
+
+- name: Install Homebrew formulae
+  community.general.homebrew:
+    name: "{{ homebrew_formulae }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+
+- name: Expose selected brew binaries system-wide
+  ansible.builtin.file:
+    src: "{{ homebrew_prefix }}/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+  loop: "{{ homebrew_system_links }}"
+  become: true

@@ -1,0 +1,19 @@
+- name: Flatpak
+  hosts: all
+  roles:
+    - { role: desktop/flatpak, tags: [desktop, flatpak] }
+
+- name: GNOME Shell extensions
+  hosts: all
+  roles:
+    - { role: desktop/gnome_extensions, tags: [desktop, gnome_extensions] }
+
+- name: Fonts
+  hosts: all
+  roles:
+    - { role: desktop/fonts, tags: [desktop, fonts] }
+
+- name: GNOME settings (dconf)
+  hosts: all
+  roles:
+    - { role: desktop/dconf, tags: [desktop, dconf] }

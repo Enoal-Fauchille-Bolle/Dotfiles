@@ -1,0 +1,35 @@
+# Each file under templates/ is a `dconf dump` of one settings path. The apply
+# script loads a file only when at least one of its keys differs from the
+# live database, and runs inside dbus-run-session when no session bus exists
+# (test containers, ssh).
+
+- name: Create the staging directory for rendered dconf files
+  ansible.builtin.file:
+    path: "{{ user_home }}/.cache/dotfiles/dconf"
+    state: directory
+    mode: '0755'
+
+- name: Render the dconf files
+  ansible.builtin.template:
+    src: "{{ item.file }}"
+    dest: "{{ user_home }}/.cache/dotfiles/dconf/{{ item.file }}"
+    mode: '0644'
+  loop: "{{ dconf_files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Install the apply script
+  ansible.builtin.copy:
+    src: dconf-apply.sh
+    dest: "{{ user_home }}/.cache/dotfiles/dconf-apply.sh"
+    mode: '0755'
+
+- name: Load the dconf files that differ from the live settings
+  ansible.builtin.command: >-
+    {{ user_home }}/.cache/dotfiles/dconf-apply.sh
+    {{ item.path }} {{ user_home }}/.cache/dotfiles/dconf/{{ item.file }}
+  loop: "{{ dconf_files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: dconf_apply
+  changed_when: dconf_apply.stdout == 'changed'

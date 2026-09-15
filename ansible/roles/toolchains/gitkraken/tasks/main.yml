@@ -1,0 +1,38 @@
+- name: Check whether GitKraken is installed
+  ansible.builtin.stat:
+    path: /opt/gitkraken/gitkraken
+  register: gitkraken_bin
+
+- name: Download GitKraken {{ gitkraken_version }}
+  ansible.builtin.get_url:
+    url: "https://api.gitkraken.dev/releases/production/linux/x64/{{ gitkraken_version }}/gitkraken-amd64.tar.gz"
+    dest: "/tmp/gitkraken-{{ gitkraken_version }}.tar.gz"
+    mode: '0644'
+  when: not gitkraken_bin.stat.exists
+
+- name: Install GitKraken into /opt
+  ansible.builtin.unarchive:
+    src: "/tmp/gitkraken-{{ gitkraken_version }}.tar.gz"
+    dest: /opt
+    remote_src: yes
+    creates: /opt/gitkraken/gitkraken
+  become: true
+  when: not gitkraken_bin.stat.exists
+
+- name: Remove the downloaded archive
+  ansible.builtin.file:
+    path: "/tmp/gitkraken-{{ gitkraken_version }}.tar.gz"
+    state: absent
+  when: not gitkraken_bin.stat.exists
+
+- name: Create the applications directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/.local/share/applications"
+    state: directory
+    mode: '0755'
+
+- name: Install the GitKraken launcher
+  ansible.builtin.copy:
+    src: gitkraken.desktop
+    dest: "{{ user_home }}/.local/share/applications/gitkraken.desktop"
+    mode: '0644'

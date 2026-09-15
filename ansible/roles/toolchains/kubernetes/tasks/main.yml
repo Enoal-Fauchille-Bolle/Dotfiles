@@ -1,0 +1,37 @@
+- name: Install kubectl
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  become: true
+
+- name: Install helm
+  ansible.builtin.unarchive:
+    src: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    dest: /usr/local/bin
+    remote_src: yes
+    include: [linux-amd64/helm]
+    extra_opts: [--strip-components=1]
+    creates: /usr/local/bin/helm
+    mode: '0755'
+  become: true
+
+- name: Create the k9s directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/.local/opt/k9s-{{ k9s_version }}"
+    state: directory
+    mode: '0755'
+
+- name: Install k9s
+  ansible.builtin.unarchive:
+    src: "https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz"
+    dest: "{{ user_home }}/.local/opt/k9s-{{ k9s_version }}"
+    remote_src: yes
+    include: [k9s]
+    creates: "{{ user_home }}/.local/opt/k9s-{{ k9s_version }}/k9s"
+
+- name: Link k9s into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ user_home }}/.local/opt/k9s-{{ k9s_version }}/k9s"
+    dest: "{{ user_home }}/.local/bin/k9s"
+    state: link

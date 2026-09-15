@@ -1,0 +1,15 @@
+# The official installer creates the ollama user, the systemd unit and adds
+# the calling user (SUDO_USER) to the ollama group.
+- name: Install Ollama {{ ollama_version }}
+  ansible.builtin.shell: |
+    curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION={{ ollama_version }} sh
+  args:
+    creates: /usr/local/bin/ollama
+  become: true
+
+- name: Add the user to the ollama group
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: [ollama]
+    append: yes
+  become: true
