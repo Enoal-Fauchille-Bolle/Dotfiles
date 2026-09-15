@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=moodle-dl token catcher
+Comment=Récupère le lien moodledl://token=... pour moodle-dl --sso
+Exec=sh -c 'exec "$HOME/my_scripts/moodledl-catch" "$1"' moodledl-catch %u
+MimeType=x-scheme-handler/moodledl;
+NoDisplay=true
+Terminal=false

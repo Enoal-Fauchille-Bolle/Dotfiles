@@ -14,6 +14,10 @@ PACKAGES=(
     nix
     atuin
     claude
+    system
+    input-remapper
+    systemd
+    desktop
 )
 SECRETS_FILE="$HOME/.zshrc.secrets"
 WAKATIME_KEY_FILE="$HOME/.wakatime.key"

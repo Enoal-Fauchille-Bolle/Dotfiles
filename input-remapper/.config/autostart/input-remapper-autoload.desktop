@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Input Remapper Autoload
+Exec=input-remapper-control --command autoload
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true

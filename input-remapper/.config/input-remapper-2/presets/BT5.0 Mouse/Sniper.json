@@ -1,0 +1,26 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 276,
+                "origin_hash": "5df9f68d4bd9a9e62997a68410cf93f3"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_F15",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 70,
+                "origin_hash": "1bbdd7e14b4cfc17dbedbb473c9e2185"
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_symbol": "BTN_EXTRA",
+        "mapping_type": "key_macro"
+    }
+]
