@@ -10,7 +10,8 @@ Centralized development environment setup: automated installation via GNU Stow f
 4. [Repository Structure](#repository-structure)
 5. [Secrets Management](#secrets-management)
 6. [Included Configurations](#included-configurations)
-7. [Post-Installation](#post-installation)
+7. [Debian Workstation Rebuild](#debian-workstation-rebuild)
+8. [Post-Installation](#post-installation)
 
 ## Overview
 
@@ -71,6 +72,8 @@ This project uses GNU Stow to manage packages. Each top-level directory represen
 ├── ssh             # SSH configuration (config file only, no keys)
 ├── wakatime        # Wakatime configuration for time tracking
 ├── zsh             # Zsh, Oh My Zsh, and Powerlevel10k setup
+├── ansible         # Full Debian workstation rebuild playbook (see below)
+├── bootstrap.sh    # Entry point for the Ansible rebuild
 ├── install.sh      # Automation script
 └── README.md       # Documentation
 ```
@@ -127,6 +130,20 @@ files here close that gap by splitting the job in half:
 
 The thresholds it reports are named, never explained: what to do about each one
 lives in `CLAUDE.md`, which is re-injected from disk after every compaction.
+
+## Debian Workstation Rebuild
+
+For a full laptop rebuild (Debian 13, GNOME) beyond what `install.sh` covers —
+apt packages, system settings, toolchains, Flatpak apps, GNOME extensions,
+fonts, and services — there is an Ansible playbook in `ansible/`, run through
+`bootstrap.sh`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
+```
+
+See [`ansible/README.md`](ansible/README.md) for usage, layout, manual
+post-playbook steps, and the VM checklist for what a container can't test.
 
 ## Post-Installation
 
