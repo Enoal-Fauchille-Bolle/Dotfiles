@@ -70,7 +70,7 @@ Local `.deb` files with no repository (reinstall from upstream releases):
 | sshm 1.11 | GitHub release binary in `/usr/local/bin` | two GNOME shortcuts call `sshm astra` and `sshm pulsar` |
 | QDiskInfo | binary in `/usr/local/bin` | source to confirm in phase 2 |
 | ollama 0.34 | ollama.com install script | creates user `ollama` and `/etc/systemd/system/ollama.service`; model `qwen3.5:0.8b` pulled by hand |
-| GitKraken 18.1.7 | official tarball in `/opt/gitkraken`, `.desktop` in `~/.local/share/applications` | pinned to 18.1.7 on request; download URL to verify from a container, the laptop blocks GitKraken domains in `/etc/hosts` |
+| GitKraken 11.1.1 | official tarball in `/opt/gitkraken`, `.desktop` in `~/.local/share/applications` | pinned to 11.1.1 on request; download URL to verify from a container, the laptop blocks GitKraken domains in `/etc/hosts` |
 | Claude Code | native installer into `~/.local/share/claude/versions`, symlink `~/.local/bin/claude` | plugins below |
 | Docker | apt (above) | user in group `docker` |
 
@@ -147,6 +147,7 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
 | Item | Value |
 |---|---|
 | systemd user units | `sniper-mouse.service`, `battery-discord.service`, `battery-discord.timer` (files to add to this repository) |
+| Stow package `input-remapper` | `~/.config/input-remapper-2` (config.json, xmodmap.json, presets for the keyboard and the BT5.0 mouse) |
 | Personal scripts to bring into `scripts/my_scripts` | `~/.local/bin/battery-discord-notify.sh`, `~/.local/bin/moodledl-catch` plus `moodledl-catch.desktop` |
 | Locale | `en_US.UTF-8` generated and default |
 | Keyboard | console `fr` `latin9` (`/etc/default/keyboard`), GRUB keymap `fr` in `/etc/grub.d/40_custom` |
@@ -172,7 +173,7 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
 | kitty | Ptyxis is the terminal; `~/.config/kitty` is empty |
 | webi | Installer tool only; the tools it placed are installed directly instead |
 | Docker CLI plugin `docker-pussh` | Dropped by decision |
-| `~/.config/sshm/config.json`, input-remapper presets | Not versioned, by decision (see open question) |
+| `~/.config/sshm/config.json` | Not versioned, by decision |
 | NetworkManager profiles (9 Wi-Fi, 2 WireGuard) | Contain keys and passwords |
 | `/etc/hosts` entries blocking GitKraken licence domains | Licence-check circumvention, not automated |
 | User `sbolle` and its subuid/subgid range | Another person's account |
@@ -180,14 +181,24 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
 | Autostart `remmina-applet.desktop` | Launches a flatpak that is no longer installed |
 | Aliases to absent tools: cmatrix, asciiquarium, neofetch, procs, todo.sh, nvim, antigravity | Not installed, by decision; the aliases stay for a later cleanup |
 
-## 3. Open questions (2026-09-15)
+## 3. Decisions on the open points (2026-09-15)
 
-- Testing: Enoal can spin up throwaway VMs (Proxmox homelab). To be decided how
-  Claude reaches them, if at all.
-- input-remapper: presets under `~/.config/input-remapper-2` are excluded by the
-  blanket "no" on remaining items; confirm, since input-remapper is empty
-  without them.
-- GitKraken 18.1.7: the pinned download URL must be checked from a container.
+- Testing: Docker containers first; a throwaway Debian VM on the Proxmox
+  homelab confirms the result at the end.
+- input-remapper: the presets under `~/.config/input-remapper-2` are
+  versioned as a stow package `input-remapper`.
+- Layout: everything Ansible lives under `ansible/`; the playbook calls
+  `install.sh` for the stow step (single list of stow packages, script still
+  usable alone on servers).
+- GitKraken 11.1.1: the pinned download URL was verified from a container.
+- `install.sh` now runs `stow --no-folding`: on a fresh machine stow used to
+  turn `~/.local`, `~/.claude` or `~/.config/systemd` into links pointing
+  inside this repository, so installers then wrote their files (Claude
+  credentials included) into the repository tree.
+- Container tests (2026-09-15): full run then second run in a fresh Debian 13
+  container with systemd, second run `changed=0 failed=0`. Flatpak was tested
+  with a single small app; GRUB, udev and sysctl reloads are skipped in
+  containers; GNOME itself needs the VM checklist in `ansible/README.md`.
 
 ## 4. Remarks noticed on the laptop, to handle later
 
@@ -219,3 +230,8 @@ Not part of the playbook. Listed so they are not forgotten.
 - `/etc/default/grub.bak-2026-08-19-2341` is a leftover backup.
 - Local `.deb` packages `input-remapper` and `kdiskmark` are newer than the
   Debian versions and will not receive updates.
+- Some dotfile links on the laptop are folded directory links
+  (`~/.config/atuin`, and possibly others); the next `install.sh` run, now
+  with `--no-folding`, replaces them with per-file links.
+- GitKraken 11.1.1 is pinned in the playbook, but the app updates itself in
+  `/opt/gitkraken`, so a rebuilt machine starts at 11.1.1 and moves on.
