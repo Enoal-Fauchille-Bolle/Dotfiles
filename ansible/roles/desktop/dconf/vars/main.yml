@@ -12,3 +12,4 @@ dconf_files:
   - { path: /org/gnome/nautilus/, file: nautilus.ini }
   - { path: /org/gtk/, file: gtk.ini }
   - { path: /org/gnome/shell/, file: shell.ini }
+  - { path: /org/gnome/Weather/, file: weather.ini }
