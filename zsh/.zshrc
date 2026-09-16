@@ -151,15 +151,6 @@ alias nvim-shortcuts="nano ~/Documents/NVIM\ Shortcuts.txt"
 alias common-c-stumper-errors="nano ~/Documents/Common\ C\ Stumper\ Errors.txt"
 alias common-c-errors="nano ~/Documents/Common\ C\ Errors.txt"
 
-# Softwares & Games
-alias postman="~/Softwares/Postman/Postman && exit"
-alias webcatalog="~/Softwares/WebCatalog/WebCatalog-56.6.2.AppImage && exit"
-alias minecraft="~/Games/Minecraft\ Launcher/minecraft-launcher && exit"
-alias rhytia="~/Games/Rhytia/SoundSpacePlus.x86_64 && exit"
-alias speedtest="~/Softwares/Speedtest/speedtest"
-alias ida="~/ida-free-pc-9.0/ida && exit"
-alias ghidra="~/Softwares/Ghidra/ghidra_11.3_PUBLIC/ghidraRun"
-
 # Shit
 alias jaaj='yes JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJ'
 alias tpd='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
