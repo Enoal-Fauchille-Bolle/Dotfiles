@@ -19,6 +19,31 @@ if [ "$(id -u)" -eq 0 ]; then
     exit 1
 fi
 
+if [ ! -r /etc/os-release ]; then
+    echo "❌ Cannot read /etc/os-release: this script only supports Debian 13." >&2
+    exit 1
+fi
+. /etc/os-release
+if [ "${ID:-}" != "debian" ]; then
+    echo "❌ This script only supports Debian, not ${PRETTY_NAME:-this system}." >&2
+    exit 1
+fi
+if [ "${VERSION_ID:-}" != "13" ]; then
+    echo "❌ This script only supports Debian 13, not ${PRETTY_NAME:-this version}." >&2
+    exit 1
+fi
+
+CURRENT_USER="$(id -un)"
+if ! command -v sudo >/dev/null 2>&1 || ! id -nG | grep -qw sudo; then
+    cat >&2 <<EOF
+❌ sudo is missing or $CURRENT_USER is not in the sudo group. As root, run:
+    apt install sudo
+    usermod -aG sudo $CURRENT_USER
+then log out, log back in and run this script again.
+EOF
+    exit 1
+fi
+
 echo "📦 Installing git and Ansible..."
 sudo apt-get update
 sudo apt-get install -y git ansible
