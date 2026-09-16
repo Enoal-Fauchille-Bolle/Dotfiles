@@ -61,4 +61,4 @@ echo "🚀 Running the playbook..."
 cd "$DOTFILES_DIR/ansible"
 ansible-playbook --ask-become-pass playbooks/all.yml "$@"
 
-echo "✅ Done. Log out and back in so the shell, groups and GNOME extensions take effect."
+echo "✅ Done. Reboot now: the shell, groups, GNOME extensions and Flatpak apps only apply to a fresh session, and logging out is not enough (see ansible/README.md)."

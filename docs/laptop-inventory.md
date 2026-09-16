@@ -212,6 +212,26 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
   user is not in the `sudo` group, printing the commands to run as root. The
   version check is strict rather than a warning because the playbook has
   only been tested on trixie.
+- First VM run on `debian-enoal` (2026-09-16, `ok=112 changed=67 failed=0`):
+  the 24 Flatpak apps, the 17 extensions, their settings and the Nerd Font
+  were all in place, but Chrome, Discord and the dock icons were missing
+  from the session even after logging out and back in. Cause: `systemd
+  --user` had started before flatpak was installed and was kept alive by
+  the SSH session, so GNOME's `XDG_DATA_DIRS` never gained
+  `/var/lib/flatpak/exports/share`. Decision: `bootstrap.sh` and the README
+  now ask for a reboot, not a logout.
+- Same run: GNOME Console showed p10k glyphs as boxes because it uses the
+  system monospace font. Decision: `monospace-font-name` is now set to
+  DroidSansM Nerd Font in `desktop-interface.ini` (the laptop had it unset).
+- The Ptyxis launcher renamed to "Terminal" and its custom icon were manual
+  files on the laptop; they now live in the `desktop` stow package.
+- Idempotence, predicted from the VM state before a second run: five keys in
+  `shell.ini` and one in `ptyxis.ini` were rewritten live by the extensions
+  (`storage-main`, `current-connection-ids`, `sunrise`, `sunset`, the shell
+  `weather/locations` copied from GNOME Weather, and the Ptyxis
+  `window-size`), which would have reloaded both files on every run.
+  Decision: those keys are dropped and the weather locations are set through
+  a new `/org/gnome/Weather/` template instead.
 
 ## 4. Remarks noticed on the laptop, to handle later
 

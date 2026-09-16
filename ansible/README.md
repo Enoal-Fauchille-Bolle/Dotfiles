@@ -80,8 +80,14 @@ Secrets never live in the repository. After the first run:
 - `ollama pull qwen3.5:0.8b`.
 - Wi-Fi and WireGuard profiles in NetworkManager.
 - Personal data: `~/my_scripts/restore.sh` from the external disk.
-- Log out and back in: the Zsh login shell, the new groups (docker, input)
-  and the GNOME extensions only apply to a new session.
+- Reboot. The Zsh login shell, the new groups (docker, input), the GNOME
+  extensions and the Flatpak apps only apply to a fresh session, and logging
+  out is not enough: `systemd --user` keeps running as long as any session of
+  the user is open (an SSH connection counts), and it is the process that
+  hands GNOME the application directories, including
+  `/var/lib/flatpak/exports/share`. Started before the playbook installed
+  flatpak, it never learns about that directory, so the Flatpak apps stay
+  invisible in the app grid and the dock until it restarts.
 
 ## What a container cannot test, and how to check it in a VM
 
@@ -97,7 +103,7 @@ Run `bootstrap.sh` there, reboot, then check:
 | Keyboard | AZERTY in GNOME and in the console (`localectl status`) |
 | Shortcuts | Super+T opens Ptyxis, Super+N the text editor, Super+Y the Downloads folder, Shift+Super+V toggles the VPN (after a WireGuard profile exists), Ctrl+Shift+Escape the system monitor |
 | Extensions | all seventeen listed and enabled in the Extensions app; dock at the bottom, clipboard indicator, Astra Monitor in the top bar |
-| Terminal | Ptyxis uses DroidSansM Nerd Font (p10k icons render) |
+| Terminal | Ptyxis and GNOME Console use DroidSansM Nerd Font (p10k icons render); Ptyxis shows the custom icon and is named Terminal in the app grid |
 | Docker | `docker run --rm hello-world` works without sudo (group applied after re-login) |
 | Ollama | `systemctl status ollama` active; `ollama list` works |
 | User units | `systemctl --user status sniper-mouse.service battery-discord.timer` (the mouse daemon needs the Bluetooth mouse; it retries every 3 s until then) |
