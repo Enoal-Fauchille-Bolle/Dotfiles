@@ -5,10 +5,14 @@
 # desktop session so that GNOME settings apply live:
 #
 #   curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
+#   wget -qO- https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
 #
-# It installs git and Ansible, clones this repository into ~/Dotfiles when it
-# is not there yet, then runs the playbook. Extra arguments are passed to
-# ansible-playbook (for example: --tags desktop, or --skip-tags flatpak_apps).
+# It refuses anything that is not Debian 13 with a working sudo, installs git
+# and Ansible, clones this repository into ~/Dotfiles when it is not there yet,
+# then runs the playbook. The sudo password is asked twice: once by apt, once
+# by Ansible (its become step runs outside the terminal's sudo ticket). Extra
+# arguments are passed to ansible-playbook (for example: --tags desktop, or
+# --skip-tags flatpak_apps).
 set -euo pipefail
 
 DOTFILES_DIR="$HOME/Dotfiles"

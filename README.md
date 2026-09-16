@@ -140,9 +140,13 @@ fonts, and services — there is an Ansible playbook in `ansible/`, run through
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
+# or, on a minimal install that ships wget but not curl:
+wget -qO- https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
 ```
 
-See [`ansible/README.md`](ansible/README.md) for usage, layout, manual
+The script only runs on Debian 13 (Ubuntu and other derivatives are refused)
+and needs the regular user in the `sudo` group. See
+[`ansible/README.md`](ansible/README.md) for usage, layout, manual
 post-playbook steps, and the VM checklist for what a container can't test.
 
 ## Post-Installation

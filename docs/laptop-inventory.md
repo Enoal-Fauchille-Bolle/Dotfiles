@@ -199,6 +199,19 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
   container with systemd, second run `changed=0 failed=0`. Flatpak was tested
   with a single small app; GRUB, udev and sysctl reloads are skipped in
   containers; GNOME itself needs the VM checklist in `ansible/README.md`.
+- `bootstrap.sh` on `debian-enoal` over SSH (2026-09-16): the first `become`
+  task failed with `sudo: a password is required` although `sudo -n true`
+  had just succeeded in the script. Cause: sudo's per-terminal ticket
+  (`tty_tickets`, the Debian default) does not cover the child process
+  Ansible uses for `become`. Decision: drop the `sudo -n true` heuristic and
+  always pass `--ask-become-pass`; one extra password prompt is the price of
+  a script that behaves the same on every Debian machine.
+- `bootstrap.sh` guards (2026-09-16): the script now refuses anything but
+  Debian 13 (`ID=debian` and `VERSION_ID=13` in `/etc/os-release`, so Ubuntu
+  and testing/sid are excluded) and stops early when `sudo` is missing or the
+  user is not in the `sudo` group, printing the commands to run as root. The
+  version check is strict rather than a warning because the playbook has
+  only been tested on trixie.
 
 ## 4. Remarks noticed on the laptop, to handle later
 

@@ -13,11 +13,23 @@ terminal inside the desktop session:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
+# or, on a minimal install that ships wget but not curl:
+wget -qO- https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
 ```
 
-`bootstrap.sh` installs git and Ansible, clones this repository into
-`~/Dotfiles` if needed, and runs `playbooks/all.yml`, asking for the sudo
-password once. Any extra argument goes to `ansible-playbook`:
+`bootstrap.sh` first checks `/etc/os-release` and stops unless the system is
+Debian 13 (`ID=debian`, `VERSION_ID=13`; Ubuntu and testing/sid are refused),
+and checks that `sudo` is installed with the current user in the `sudo` group
+(the Debian installer skips both when a root password is set; the script
+prints the commands to fix it). It then installs git and Ansible, clones this
+repository into `~/Dotfiles` if needed, and runs `playbooks/all.yml`.
+
+The sudo password is asked twice: once by `apt`, once by Ansible through
+`--ask-become-pass`. The second prompt is always shown, even right after the
+first: sudo caches its authorisation per terminal, and Ansible runs its
+`become` commands in a child process that sudo does not tie to that terminal,
+so a `sudo -n true` check in the script cannot predict whether Ansible will
+get through. Any extra argument goes to `ansible-playbook`:
 
 ```bash
 ~/Dotfiles/bootstrap.sh --tags desktop          # one domain only
