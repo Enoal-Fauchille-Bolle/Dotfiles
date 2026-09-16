@@ -188,6 +188,7 @@ alias kctl="kubectl"
 alias end="notify-send --urgency=low 'Finished'"
 alias ag="antigravity"
 alias claude2='CLAUDE_CONFIG_DIR=~/.claude2 claude'
+alias ch='claude-history'
 
 # Others
 alias f="fuck"
