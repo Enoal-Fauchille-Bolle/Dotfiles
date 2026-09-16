@@ -28,14 +28,8 @@ if [ ! -d "$DOTFILES_DIR" ]; then
     git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
 
-# Ask for the sudo password only when sudo actually needs one.
-ASK_PASS=()
-if ! sudo -n true 2>/dev/null; then
-    ASK_PASS=(--ask-become-pass)
-fi
-
 echo "🚀 Running the playbook..."
 cd "$DOTFILES_DIR/ansible"
-ansible-playbook "${ASK_PASS[@]}" playbooks/all.yml "$@"
+ansible-playbook --ask-become-pass playbooks/all.yml "$@"
 
 echo "✅ Done. Log out and back in so the shell, groups and GNOME extensions take effect."
