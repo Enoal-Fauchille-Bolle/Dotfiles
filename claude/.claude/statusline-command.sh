@@ -289,4 +289,31 @@ if [ -n "$transcript" ]; then
   fi
 fi
 
+# ── Recorder: append the official quota to a history, one line per change ──
+# The sensor above is overwritten on every redraw, so no history of the real
+# /usage percentages survives it. claude-usage needs that history to replace its
+# hand-calibrated budgets with a measured $-per-% ratio, and to estimate the
+# share of the limit spent outside this machine (claude.ai, other devices).
+# Deduplicated against the last recorded values of the same account, so a
+# redraw that changes nothing writes nothing. The account is the config dir's
+# basename (.claude, .claude2): each Pro seat has its own limits.
+if [ -n "$five_pct" ] || [ -n "$week_pct" ]; then
+  state_dir="$HOME/.claude/state"
+  account=$(basename "${CLAUDE_CONFIG_DIR:-$HOME/.claude}")
+  key="${five_pct}|${week_pct}|${five_reset}|${week_reset}"
+  last_file="$state_dir/quota-last-${account}.txt"
+  if mkdir -p "$state_dir" 2>/dev/null \
+     && [ "$key" != "$(cat "$last_file" 2>/dev/null)" ]; then
+    printf '%s' "$key" > "$last_file" 2>/dev/null
+    jq -nc --argjson ts "$now" --arg account "$account" \
+      --arg five "$five_pct" --arg seven "$week_pct" \
+      --arg five_reset "$five_reset" --arg seven_reset "$week_reset" \
+      '{ts: $ts, account: $account,
+        five: ($five | tonumber? // null), seven: ($seven | tonumber? // null),
+        five_reset: ($five_reset | tonumber? // null),
+        seven_reset: ($seven_reset | tonumber? // null)}' \
+      >> "$state_dir/quota-history.jsonl" 2>/dev/null
+  fi
+fi
+
 printf '%b' "${out}\n${line2}"
