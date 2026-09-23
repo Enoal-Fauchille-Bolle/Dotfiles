@@ -257,7 +257,7 @@ out="${out} ${DIM}|${RESET} ${velocity}"
 # margin, (+8) is 8 points ahead of the pace. The gap, not the raw percentage,
 # picks the colour -- 40% in the first hour of a 5h window is the real warning.
 # Past 90% used, the pace no longer matters: one large request can hit the
-# limit, so the percentage turns bold white on a blinking red background.
+# limit, so the percentage turns blinking bold red on a white background.
 build_limit() {
   local emoji=$1 label=$2 pct=$3 reset=$4 window=$5 pi col bar left="" pace="" gap="" d
   if [ -z "$pct" ]; then
@@ -281,7 +281,7 @@ build_limit() {
     else gap=" (+${d})"; fi
   elif [ "$pi" -ge 70 ]; then col="$YELLOW"
   else col="$GREEN"; fi
-  [ "$pi" -ge 90 ] && col='\033[1;5;97;41m'
+  [ "$pi" -ge 90 ] && col='\033[1;5;31;107m'
   bar=$(make_bar "$pi" 20 "$pace")
   printf '%s' "${emoji} ${label} ${bar} ${col}${pi}%${gap}${RESET}${left}"
 }
