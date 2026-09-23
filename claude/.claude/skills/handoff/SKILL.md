@@ -3,15 +3,21 @@ name: handoff
 description: Écrit le prompt de reprise de la conversation en cours dans un fichier, avant un /clear.
 argument-hint: "[chemin de destination]"
 disable-model-invocation: true
-allowed-tools: Write
+allowed-tools: Write, Edit
 ---
 
 Construis le prompt de reprise de cette conversation et écris-le dans un fichier.
 
 Destination : `$ARGUMENTS` s'il est fourni, sinon
-`~/.claude/handoffs/<nom du dossier courant>-<AAAA-MM-JJ-hhmm>.md`. Jamais dans un
-dépôt git : un handoff n'a pas à être versionné, et le dossier courant en est
-souvent un.
+`~/.claude/exports/<projet>/handoffs/handoff-<sujet>-<AAAA-MM-JJ>.md`, où `<projet>`
+est un dossier existant de `~/.claude/exports/` choisi d'après le sujet, pas
+d'après le dossier courant. Si aucun ne convient, demande à Enoal avant d'en créer
+un. Jamais dans un dépôt git : un handoff n'a pas à être versionné, et le dossier
+courant en est souvent un.
+
+Ajoute ensuite une ligne pour ce fichier dans le tableau du projet de
+`~/.claude/exports/README.md`, l'index, et marque comme remplacé le handoff
+précédent du même fil s'il y en a un.
 
 Le fichier contient ceci, dans cet ordre, et rien d'autre :
 
