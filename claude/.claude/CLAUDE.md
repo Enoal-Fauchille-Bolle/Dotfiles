@@ -41,8 +41,10 @@ travailler, pas après :
 - **Je pose une question hors sujet** : me rappeler `/btw`, dont la réponse
   n'entre jamais dans l'historique.
 - **Tu me proposes un `/export`** : toujours avec un chemin, jamais nu —
-  `/export ~/.claude/exports/<sujet>-<AAAA-MM-JJ>.md`. Sans argument il
-  atterrit dans le dossier courant, qui est presque toujours un dépôt git.
+  `/export ~/.claude/exports/<projet>/conversations/<sujet>-<AAAA-MM-JJ>.md`,
+  où `<projet>` est un dossier existant de `~/.claude/exports/` (index dans
+  son `README.md`). Sans argument il atterrit dans le dossier courant, qui est
+  presque toujours un dépôt git.
 
 ## Compact Instructions
 
