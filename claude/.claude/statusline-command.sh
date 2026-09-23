@@ -17,13 +17,23 @@ RESET='\033[0m'
 rgb() { printf '\033[38;2;%d;%d;%dm' "$1" "$2" "$3"; }
 
 # ── Fixed-width green→red gradient progress bar for a 0-100 percentage ──
-# Usage: make_bar <percent> <width>. Emits full blocks for the filled part and
-# dim blocks for the rest. Mixes real ESC bytes (from rgb) with literal \033
-# escapes; both are resolved by the final `printf '%b'`.
+# Usage: make_bar <percent> <width> [pace]. Emits full blocks for the filled part
+# and dim blocks for the rest. An optional 0-100 pace replaces its cell with a
+# blue marker, a colour that reads on both dark and light terminal themes.
+# Mixes real ESC bytes (from rgb) with literal \033 escapes; both are resolved
+# by the final `printf '%b'`.
 make_bar() {
-  local pct=$1 width=$2 i pos r g b adj filled out=""
+  local pct=$1 width=$2 pace=$3 i pos r g b adj filled mark=-1 out=""
   filled=$(( (pct * width + 50) / 100 ))
+  if [ -n "$pace" ]; then
+    mark=$(( pace * width / 100 ))
+    [ "$mark" -ge "$width" ] && mark=$(( width - 1 ))
+  fi
   for (( i=0; i<width; i++ )); do
+    if [ "$i" -eq "$mark" ]; then
+      out="${out}\033[1;38;2;80;170;255m┃${RESET}"
+      continue
+    fi
     pos=$(( i * 100 / (width - 1) ))
     if [ "$pos" -le 50 ]; then
       r=$(( 0 + 220 * pos / 50 )); g=200; b=$(( 80 - 80 * pos / 50 ))
@@ -238,23 +248,42 @@ out="${out} ${DIM}|${RESET} ${velocity}"
 # percentages plus their reset timestamps — the same figures as `/usage`.
 # No external tool, no network, no dollars: read straight from stdin JSON.
 
-# Render one limit segment: <emoji> <label> <percent> <resets_at_epoch>.
+# Render one limit segment: <emoji> <label> <percent> <resets_at_epoch> <window_secs>.
 # Falls back to a dim placeholder when the percentage is absent.
+#
+# Pace: the share of the window already elapsed, i.e. where usage would sit if
+# the quota were spent evenly until the reset. It is drawn as a marker in the
+# bar and the gap to it is printed after the percentage: (-67) is 67 points of
+# margin, (+8) is 8 points ahead of the pace. The gap, not the raw percentage,
+# picks the colour -- 40% in the first hour of a 5h window is the real warning.
+# Past 90% used, the pace no longer matters: one large request can hit the
+# limit, so the percentage turns bold white on a blinking red background.
 build_limit() {
-  local emoji=$1 label=$2 pct=$3 reset=$4 pi col bar left=""
+  local emoji=$1 label=$2 pct=$3 reset=$4 window=$5 pi col bar left="" pace="" gap="" d
   if [ -z "$pct" ]; then
     printf '%s' "${DIM}${emoji} ${label}: --${RESET}"
     return
   fi
   pi=$(printf '%.0f' "$pct")
-  if [ "$pi" -ge 90 ]; then col="$RED"
-  elif [ "$pi" -ge 70 ]; then col="$YELLOW"
-  else col="$GREEN"; fi
-  bar=$(make_bar "$pi" 20)
   if [ -n "$reset" ] && [ "$reset" != "null" ]; then
     left=" ${DIM}$(fmt_remaining $(( reset - now ))) left → $(fmt_at "$reset")${RESET}"
+    pace=$(( (window - (reset - now)) * 100 / window ))
+    [ "$pace" -lt 0 ] && pace=0
+    [ "$pace" -gt 100 ] && pace=100
   fi
-  printf '%s' "${emoji} ${label} ${bar} ${col}${pi}%${RESET}${left}"
+  if [ -n "$pace" ]; then
+    d=$(( pi - pace ))
+    if [ "$d" -le 0 ]; then col="$GREEN"
+    elif [ "$d" -le 10 ]; then col="$YELLOW"
+    else col="$RED"; fi
+    if [ "$d" -eq 0 ]; then gap=" (±0)"
+    elif [ "$d" -lt 0 ]; then gap=" (${d})"
+    else gap=" (+${d})"; fi
+  elif [ "$pi" -ge 70 ]; then col="$YELLOW"
+  else col="$GREEN"; fi
+  [ "$pi" -ge 90 ] && col='\033[1;5;97;41m'
+  bar=$(make_bar "$pi" 20 "$pace")
+  printf '%s' "${emoji} ${label} ${bar} ${col}${pi}%${gap}${RESET}${left}"
 }
 
 five_pct=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
@@ -262,8 +291,8 @@ five_reset=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 week_pct=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
 week_reset=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
-five_part=$(build_limit "⏳" "5h" "$five_pct" "$five_reset")
-week_part=$(build_limit "📅" "7d" "$week_pct" "$week_reset")
+five_part=$(build_limit "⏳" "5h" "$five_pct" "$five_reset" 18000)
+week_part=$(build_limit "📅" "7d" "$week_pct" "$week_reset" 604800)
 
 # ── Render timestamp: the honest reference for every countdown above ──
 # Nothing on this line refreshes on its own, so print when it was last drawn:
