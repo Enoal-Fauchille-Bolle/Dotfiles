@@ -20,9 +20,13 @@ d'alerte. Ce que chacun t'oblige à me dire :
 | `CONTEXTE_DECISION` | ~150k. Même tâche → propose `/compact <consignes>`. Autre tâche → `/clear`. |
 | `CONTEXTE_STOP` | ~300k. Propose `/clear`, et le handoff juste avant. |
 | `COUT` | ≥ 15 $ : un tiers d'une fenêtre 5 h dans cette seule conversation. |
-| `QUOTA_5H` | ≥ 70 % : ne pas ouvrir de nouveau chantier, terminer celui en cours. |
-| `QUOTA_7D` | ≥ 80 % : je bascule de compte ou je lève le pied. |
+| `QUOTA_5H` | Plus de 10 points d'avance sur le rythme, ou ≥ 90 % : ne pas ouvrir de nouveau chantier, terminer celui en cours. |
+| `QUOTA_7D` | Plus de 10 points d'avance sur le rythme, ou ≥ 90 % : je bascule de compte ou je lève le pied. |
 | `CACHE_FROID` | La prochaine requête réécrit tout le contexte à prix double. |
+
+Le rythme est la part de la fenêtre déjà écoulée : le trait bleu de ma status line.
+Un pourcentage élevé avec un écart négatif, comme `73 % (rythme 77 %, -4)`, est
+normal : ne le signale pas.
 
 Signale-le **une fois, en tête de réponse, en deux lignes au plus**, puis fais le
 travail demandé. Ce n'est ni un refus ni un motif de sermon répété à chaque tour.

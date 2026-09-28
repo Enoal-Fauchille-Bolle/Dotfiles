@@ -311,9 +311,10 @@ line2="${five_part} ${DIM}|${RESET} ${week_part}${updated_part}"
 if [ -n "$transcript" ]; then
   state_dir="$HOME/.claude/state"
   if mkdir -p "$state_dir" 2>/dev/null; then
-    printf 'pct=%s\ntokens=%s\nwindow=%s\ncost=%s\nfive=%s\nseven=%s\ncache_expiry=%s\n' \
+    printf 'pct=%s\ntokens=%s\nwindow=%s\ncost=%s\nfive=%s\nseven=%s\nfive_reset=%s\nseven_reset=%s\ncache_expiry=%s\n' \
       "${used_int:-}" "${ctx_tokens:-0}" "${window_size:-0}" "${cost:-0}" \
-      "${five_pct%%.*}" "${week_pct%%.*}" "${cache_expiry:-0}" \
+      "${five_pct%%.*}" "${week_pct%%.*}" "${five_reset%%.*}" "${week_reset%%.*}" \
+      "${cache_expiry:-0}" \
       > "$state_dir/ctx-$(basename "$transcript" .jsonl).txt" 2>/dev/null
   fi
 fi

@@ -27,8 +27,10 @@ set -uo pipefail
 CTX_DECISION=${BUDGET_CTX_DECISION:-150000}   # decide: same task -> /compact, new task -> /clear
 CTX_STOP=${BUDGET_CTX_STOP:-300000}           # 32% of spend, zero return
 COST_WARN=${BUDGET_COST_WARN:-15}             # ~1/3 of a 5h window in one conversation
-FIVE_WARN=${BUDGET_FIVE_WARN:-70}             # do not open a new chantier
-SEVEN_WARN=${BUDGET_SEVEN_WARN:-80}           # switch account or ease off
+PACE_GAP=${BUDGET_PACE_GAP:-10}               # points ahead of the pace: the status line's red
+QUOTA_HARD=${BUDGET_QUOTA_HARD:-90}           # past this, the pace no longer matters
+FIVE_WARN=${BUDGET_FIVE_WARN:-70}             # fallback when no reset time is known
+SEVEN_WARN=${BUDGET_SEVEN_WARN:-80}           # fallback when no reset time is known
 CACHE_MIN=${BUDGET_CACHE_MIN:-100000}         # a cold cache only matters on a big context
 CACHE_TTL=${CLAUDE_CACHE_TTL:-3600}           # 1h on a subscription, 5min on credits
 STATE_MAX_AGE=${BUDGET_STATE_MAX_AGE:-900}    # status line output older than this is stale
@@ -40,7 +42,7 @@ transcript=$(printf '%s' "$input" | jq -r '.transcript_path // empty' 2>/dev/nul
 [ -n "$transcript" ] || exit 0
 
 now=$(date +%s)
-pct= tokens=0 window=0 cost=0 five= seven= cache_expiry=0
+pct= tokens=0 window=0 cost=0 five= seven= five_reset= seven_reset= cache_expiry=0
 
 # ── Preferred sensor: whatever the status line last published ──────────────────
 # These are the payload's own figures, and they are the only source for the 5h
@@ -55,6 +57,7 @@ if [ -f "$state" ]; then
       case "$k" in
         pct) pct=$v ;; tokens) tokens=${v:-0} ;; window) window=${v:-0} ;;
         cost) cost=${v:-0} ;; five) five=$v ;; seven) seven=$v ;;
+        five_reset) five_reset=$v ;; seven_reset) seven_reset=$v ;;
         cache_expiry) cache_expiry=${v:-0} ;;
       esac
     done < "$state"
@@ -94,8 +97,37 @@ tripped=()
 [ "$tokens" -ge "$CTX_STOP" ] && tripped+=("CONTEXTE_STOP") \
   || { [ "$tokens" -ge "$CTX_DECISION" ] && tripped+=("CONTEXTE_DECISION"); }
 awk -v c="$cost" -v t="$COST_WARN" 'BEGIN{exit !(c+0>=t+0)}' && tripped+=("COUT")
-[ -n "$five" ]  && [ "$five"  -ge "$FIVE_WARN"  ] 2>/dev/null && tripped+=("QUOTA_5H")
-[ -n "$seven" ] && [ "$seven" -ge "$SEVEN_WARN" ] 2>/dev/null && tripped+=("QUOTA_7D")
+
+# Pace: the share of the window already elapsed, i.e. where usage would sit if
+# the quota were spent evenly until the reset -- the status line's blue marker,
+# recomputed here at prompt time. A raw 73% is fine three hours into a 5h
+# window; what matters is the gap to the pace. So a quota trips when usage runs
+# more than PACE_GAP points ahead of it (the status line's red), or past
+# QUOTA_HARD whatever the pace, since one large request can then hit the limit.
+# Without a reset time there is no pace, and the old fixed threshold applies.
+# Usage: quota_gap <pct> <reset_epoch> <window_secs>; prints "pace gap", or
+# nothing when the pace is unknown.
+quota_gap() {
+  local pct=$1 reset=$2 win=$3 pace
+  [ -n "$reset" ] && [ "$reset" -gt 0 ] 2>/dev/null || return 0
+  pace=$(( (win - (reset - now)) * 100 / win ))
+  [ "$pace" -lt 0 ] && pace=0
+  [ "$pace" -gt 100 ] && pace=100
+  echo "$pace $(( pct - pace ))"
+}
+# Usage: quota_trips <pct> <gap_or_empty> <fallback_threshold>
+quota_trips() {
+  local pct=$1 gap=$2 fallback=$3
+  [ -n "$pct" ] && [ "$pct" -ge 0 ] 2>/dev/null || return 1
+  [ "$pct" -ge "$QUOTA_HARD" ] && return 0
+  if [ -n "$gap" ]; then [ "$gap" -gt "$PACE_GAP" ]
+  else [ "$pct" -ge "$fallback" ]; fi
+}
+five_pace= five_gap= seven_pace= seven_gap=
+[ -n "$five" ]  && read -r five_pace five_gap   < <(quota_gap "$five"  "$five_reset"  18000)
+[ -n "$seven" ] && read -r seven_pace seven_gap < <(quota_gap "$seven" "$seven_reset" 604800)
+quota_trips "$five"  "$five_gap"  "$FIVE_WARN"  && tripped+=("QUOTA_5H")
+quota_trips "$seven" "$seven_gap" "$SEVEN_WARN" && tripped+=("QUOTA_7D")
 cold=0
 [ "$cache_expiry" -gt 0 ] && [ "$now" -ge "$cache_expiry" ] \
   && [ "$tokens" -ge "$CACHE_MIN" ] && { cold=1; tripped+=("CACHE_FROID"); }
@@ -105,8 +137,19 @@ cold=0
 # ── Report. Data only; the obligations attached to each name are in CLAUDE.md ──
 line="contexte $(( tokens / 1000 ))k (${pct}%)"
 awk -v c="$cost" 'BEGIN{exit !(c+0>0)}' && line="$line · \$$(printf '%.2f' "$cost")"
-[ -n "$five" ]  && line="$line · 5h ${five}%"
-[ -n "$seven" ] && line="$line · 7d ${seven}%"
+# The gap is printed signed, like the status line: -4 is margin, +12 is ahead.
+fmt_quota() {
+  local label=$1 pct=$2 pace=$3 gap=$4 s
+  [ -n "$pct" ] || return 0
+  if [ -n "$gap" ]; then
+    s=$gap; [ "$gap" -gt 0 ] && s="+$gap"; [ "$gap" -eq 0 ] && s="±0"
+    printf ' · %s %s%% (rythme %s%%, %s)' "$label" "$pct" "$pace" "$s"
+  else
+    printf ' · %s %s%%' "$label" "$pct"
+  fi
+}
+line="$line$(fmt_quota 5h "$five" "$five_pace" "$five_gap")"
+line="$line$(fmt_quota 7d "$seven" "$seven_pace" "$seven_gap")"
 [ "$cold" -eq 1 ] && line="$line · cache froid depuis $(date -d "@$cache_expiry" +%H:%M)"
 
 printf '[budget] %s\n' "$line"
