@@ -152,6 +152,7 @@ system_timezone: Europe/Paris
 keyboard_layout: fr
 keyboard_variant: latin9
 logind_handle_lid_switch: lock
+logind_handle_power_key: suspend
 sysctl_inotify_max_user_instances: 1024
 grub_cmdline_linux_default: "quiet usb-storage.quirks=0bc2:231a:u,152d:0580:u"
 

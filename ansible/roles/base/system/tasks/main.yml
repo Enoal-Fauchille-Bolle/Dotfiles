@@ -49,6 +49,17 @@
   become: true
   tags: [logind]
 
+# GNOME normally handles the power key itself, but logind takes over with its
+# own default (poweroff) whenever it ignores GNOME's inhibitor.
+- name: Suspend when the power key is pressed
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/logind.conf
+    regexp: '^#?HandlePowerKey='
+    line: "HandlePowerKey={{ logind_handle_power_key }}"
+    insertafter: '^\[Login\]'
+  become: true
+  tags: [logind]
+
 ################################### sysctl ###################################
 
 - name: Raise the inotify instance limit (IDE and file watchers)
