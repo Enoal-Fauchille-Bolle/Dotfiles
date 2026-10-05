@@ -153,6 +153,7 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
 | Keyboard | console `fr` `latin9` (`/etc/default/keyboard`), GRUB keymap `fr` in `/etc/grub.d/40_custom` |
 | Timezone | `Europe/Paris` |
 | logind | `HandleLidSwitch=lock`, `HandlePowerKey=suspend` |
+| polkit | `/etc/polkit-1/rules.d/50-suspend-ignore-inhibit.rules`: `enoal` may suspend while an app blocks sleep, otherwise GNOME powers off on the power key |
 | sysctl | `/etc/sysctl.d/90-inotify.conf`: `fs.inotify.max_user_instances = 1024` |
 | udev | `/etc/udev/rules.d/51-oneplus-10t-mtp.rules` (MTP access for OnePlus 10T, vendor 22d9 product 2766) |
 | GRUB | `GRUB_CMDLINE_LINUX_DEFAULT="quiet usb-storage.quirks=0bc2:231a:u,152d:0580:u"`, `GRUB_TERMINAL_INPUT=at_keyboard`, `GRUB_PRELOAD_MODULES="at_keyboard keylayouts"` |

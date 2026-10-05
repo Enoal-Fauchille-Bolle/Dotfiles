@@ -60,6 +60,22 @@
   become: true
   tags: [logind]
 
+# When an app blocks sleep (a file copy in Files), CanSuspend answers
+# "challenge", GNOME falls back to its shutdown path and powers off.
+- name: Let the user suspend from the power key while an app blocks sleep
+  ansible.builtin.copy:
+    dest: /etc/polkit-1/rules.d/50-suspend-ignore-inhibit.rules
+    content: |
+      polkit.addRule(function (action, subject) {
+          if (action.id == "org.freedesktop.login1.suspend-ignore-inhibit" &&
+              subject.user == "{{ user_name }}" && subject.local && subject.active) {
+              return polkit.Result.YES;
+          }
+      });
+    mode: '0644'
+  become: true
+  tags: [logind, polkit]
+
 ################################### sysctl ###################################
 
 - name: Raise the inotify instance limit (IDE and file watchers)
