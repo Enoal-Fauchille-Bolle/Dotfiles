@@ -52,6 +52,27 @@ travailler, pas après :
   son `README.md`). Sans argument il atterrit dans le dossier courant, qui est
   presque toujours un dépôt git.
 
+## Écriture publique
+
+S'applique à tout fichier suivi dans un dépôt **public** (`gh repo view --json visibility`).
+
+- **Voix impersonnelle** : décrire ce qui a été fait, pas qui l'a fait.
+- **Pas de tiret long (—) dans une phrase** : écrire le mot qu'il remplace (virgule,
+  « because », « so », deux-points, parenthèses ou point). Il reste permis comme
+  séparateur d'étiquette : titres, tableaux, schémas, entrées datées
+  (`**AAAA-MM-JJ — Titre.**`).
+- **Libellé de liste suivi de deux-points** : `- **Networking**: …`, jamais
+  `- **Networking** — …`.
+- **Pas d'en-tête de gabarit** : ni `Language:`, ni `Last updated:` (git le sait), ni
+  bloc d'état de plus d'une ligne.
+- **Pas de tournure toute faite** : pas de chute « not X, but Y », pas trois phrases de
+  suite bâties pareil, pas d'intensif (entirely, ever, powerful, seamless, robust,
+  crucial).
+- **Pas d'emoji dans les titres.** Les emoji de catégorie dans les tableaux restent permis.
+- **Les données privées restent hors du dépôt** : failles, adresses personnelles,
+  historique d'exposition et détails personnels vont dans `~/.claude/exports/<projet>/`,
+  jamais dans un fichier suivi. Le `CLAUDE.md` du dépôt nomme le fichier exact.
+
 ## Compact Instructions
 
 Préserver, dans cet ordre : l'objectif en cours et son état d'avancement ; les
