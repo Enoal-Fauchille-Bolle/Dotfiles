@@ -44,13 +44,17 @@ def find_device() -> InputDevice | None:
 
 
 async def watch(original_speed: str) -> None:
+    waiting = False  # évite de répéter le message tant que la souris est absente
     while True:
         dev = find_device()
         if not dev:
-            print(f"[sniper] Device introuvable, retry dans {RETRY_DELAY}s...")
+            if not waiting:
+                print(f"[sniper] Device introuvable, retry toutes les {RETRY_DELAY}s...")
+                waiting = True
             await asyncio.sleep(RETRY_DELAY)
             continue
 
+        waiting = False
         print(f"[sniper] Connecté : {dev.name} ({dev.path})")
         try:
             async for event in dev.async_read_loop():
