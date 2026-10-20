@@ -35,11 +35,14 @@ Sans attendre le hook, quand tu l'observes toi-même — et là aussi avant de
 travailler, pas après :
 
 - **Je change de sujet** : le dire. Une session = une tâche ; `/clear` est gratuit.
-- **Une tâche est finie** : proposer le handoff puis `/clear`, sans attendre que
-  je le demande. Un bon handoff porte l'objectif, l'état, les décisions et leur
-  raison, les fichiers touchés, la prochaine étape, le modèle et l'effort.
-  Pour l'écrire, suis toujours `~/.claude/skills/handoff/SKILL.md`, même quand
-  je le demande en toutes lettres plutôt qu'avec `/handoff`.
+- **Une tâche est finie** : proposer `/clear`, sans attendre que je le demande.
+  Proposer le handoff avant seulement s'il reste du travail pour une autre
+  session (tâche inachevée, suite prévue). Si tout est fait et que ce qui me
+  reste est déjà écrit dans les fichiers, ne pas le proposer. Un bon handoff
+  porte l'objectif, l'état, les décisions et leur raison, les fichiers touchés,
+  la prochaine étape, le modèle et l'effort. Pour l'écrire, suis toujours
+  `~/.claude/skills/handoff/SKILL.md`, même quand je le demande en toutes
+  lettres plutôt qu'avec `/handoff`.
 - **Tu vas lire un gros volume** (logs, exploration large, gros fichier) :
   proposer un sous-agent. Son contexte est séparé du tien ; seul le résumé remonte.
 - **Un skill lourd pour un détail** : le dire avant de le charger. Une fois
