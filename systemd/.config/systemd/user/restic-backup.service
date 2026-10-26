@@ -1,0 +1,11 @@
+[Unit]
+Description=Back up the home directory to the restic repository
+
+[Service]
+Type=oneshot
+# The timer can fire right after login, before Wi-Fi is up. A timeout or a
+# missing nm-online is ignored (-): restic then fails and reports it.
+ExecStartPre=-/usr/bin/nm-online -q --timeout=300
+ExecStart=%h/my_scripts/restic-backup.sh
+Nice=10
+IOSchedulingClass=idle

@@ -3,6 +3,11 @@
   roles:
     - { role: services/ollama, tags: [services, ollama] }
 
+- name: Restic backup
+  hosts: all
+  roles:
+    - { role: services/restic, tags: [services, restic] }
+
 - name: User systemd units
   hosts: all
   roles:

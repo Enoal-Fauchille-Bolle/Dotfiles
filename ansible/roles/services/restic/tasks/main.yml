@@ -1,0 +1,54 @@
+# The script comes from the `scripts` stow package and the units from the
+# `systemd` one; services/user_units enables the timer. This role installs
+# restic and writes its configuration. Setup and restore: README.md.
+
+- name: Install restic
+  ansible.builtin.apt:
+    name: restic
+    state: present
+  become: true
+
+- name: Create the restic config directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/.config/restic"
+    state: directory
+    mode: '0700'
+
+- name: Create an empty restic environment file (fill it by hand)
+  ansible.builtin.copy:
+    dest: "{{ user_home }}/.config/restic/env"
+    content: |
+      # Sourced by restic-backup.sh, and by hand before any restic command
+      # (`source ~/.config/restic/env`). Keep this file out of any repository;
+      # the reference copy lives in the password manager.
+      # export RESTIC_REPOSITORY='s3:https://s3.<region>.backblazeb2.com/<bucket>'
+      # export AWS_ACCESS_KEY_ID='<B2 keyID>'
+      # export AWS_SECRET_ACCESS_KEY='<B2 applicationKey>'
+      # export RESTIC_PASSWORD='...'
+      # export KUMA_PUSH_URL='https://<uptime-kuma>/api/push/<token>'
+      # One host name for every laptop, so a new machine continues the same
+      # chain of snapshots.
+      export RESTIC_HOST=laptop
+    mode: '0600'
+    force: no
+
+- name: Write the list of backed-up paths
+  ansible.builtin.copy:
+    dest: "{{ user_home }}/.config/restic/include"
+    # restic expands neither ~ nor $HOME in this file: absolute paths only.
+    content: |
+      # Written by Ansible from restic_include in group_vars/all.yml.
+      {% for path in restic_include %}
+      {{ user_home }}/{{ path }}
+      {% endfor %}
+    mode: '0644'
+
+- name: Write the list of excluded patterns
+  ansible.builtin.copy:
+    dest: "{{ user_home }}/.config/restic/exclude"
+    content: |
+      # Written by Ansible from restic_exclude in group_vars/all.yml.
+      {% for pattern in restic_exclude %}
+      {{ user_home }}/{{ pattern }}
+      {% endfor %}
+    mode: '0644'

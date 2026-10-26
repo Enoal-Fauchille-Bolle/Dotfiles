@@ -306,3 +306,40 @@ nerd_fonts_archives:
 systemd_user_units_enabled:
   - sniper-mouse.service
   - battery-discord.timer
+  - restic-backup.timer
+
+# What restic-backup.sh sends to the repository, relative to the home
+# directory. Only these paths are backed up; everything else (caches,
+# ~/.config, tools the playbook reinstalls) is left out.
+restic_include:
+  - Documents
+  - Projects
+  - TermOxide
+  - Downloads
+  - Pictures
+  - Videos
+  - .claude
+  - Dotfiles
+  - .ssh
+  - .gnupg
+  - .zshrc.secrets
+  - .kube
+  - .docker
+  - .wakatime.key
+  - .local/share/keyrings
+  - .zsh_history
+  - .local/share/atuin
+# Excluded inside the paths above. ** matches any depth, including none.
+restic_exclude:
+  - Projects/**/node_modules
+  - Projects/**/target
+  - Projects/**/dist
+  - Projects/**/.venv
+  - TermOxide/**/node_modules
+  - TermOxide/**/target
+  - TermOxide/**/dist
+  - TermOxide/**/.venv
+  - Downloads/**/*.iso
+  # Outside every included path: listed to record that the Chrome profile
+  # is left out on purpose.
+  - .var/app/com.google.Chrome

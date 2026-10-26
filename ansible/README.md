@@ -52,7 +52,7 @@ ansible/
 │   ├── shell.yml          # zsh, oh-my-zsh, p10k, install.sh (stow)
 │   ├── toolchains.yml     # rust, node, bun, homebrew, python, k8s, tools, claude, gitkraken
 │   ├── desktop.yml        # flatpak, gnome extensions, fonts, dconf
-│   └── services.yml       # ollama, user systemd units
+│   └── services.yml       # ollama, restic backup, user systemd units
 └── roles/<domain>/<role>/ # tags: [domain, role]
 ```
 
@@ -72,6 +72,9 @@ Secrets never live in the repository. After the first run:
 
 - `~/.zshrc.secrets`, `~/.wakatime.key` and `~/.config/battery-discord/config`
   are created empty: fill them.
+- Backup: `~/.config/restic/env` is created with comments only. The bucket,
+  key, `restic init` and Kuma monitor steps are in
+  `roles/services/restic/README.md`.
 - SSH keys: restore `~/.ssh/id_ed25519` and `.pub` (git commit signing uses
   the public key).
 - Logins: `sudo tailscale up`, `gh auth login`, `atuin login`, VS Code
@@ -106,7 +109,7 @@ Run `bootstrap.sh` there, reboot, then check:
 | Terminal | Ptyxis and GNOME Console use DroidSansM Nerd Font (p10k icons render); Ptyxis shows the custom icon and is named Terminal in the app grid |
 | Docker | `docker run --rm hello-world` works without sudo (group applied after re-login) |
 | Ollama | `systemctl status ollama` active; `ollama list` works |
-| User units | `systemctl --user status sniper-mouse.service battery-discord.timer` (the mouse daemon needs the Bluetooth mouse; it retries every 3 s until then) |
+| User units | `systemctl --user status sniper-mouse.service battery-discord.timer restic-backup.timer` (the mouse daemon needs the Bluetooth mouse; it retries every 3 s until then) |
 | input-remapper | the `Sniper` preset loads for the BT5.0 mouse at login |
 | Flatpak | the 24 apps appear in the app grid; Chrome sees `~` read-only in its sandbox (`flatpak override --user --show com.google.Chrome`) |
 | MIME | links open in Chrome, videos in VLC, `claude://` links in Claude Desktop |
