@@ -32,19 +32,27 @@ for var in RESTIC_REPOSITORY RESTIC_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS
     [[ -n "${!var:-}" ]] || fail "$var is not set in $ENV_FILE"
 done
 
+# restic only warns in the journal about a listed path that does not exist and
+# still exits 0, so the Kuma message names it: a renamed folder would otherwise
+# stop being backed up with the monitor still green.
+missing=""
+while IFS= read -r path; do
+    [[ -z $path || $path == \#* || -e $path ]] || missing+="${missing:+, }$path"
+done < "$CONFIG_DIR/include"
+
 restic backup \
     --files-from "$CONFIG_DIR/include" \
     --exclude-file "$CONFIG_DIR/exclude"
 status=$?
 
 # 3 means a snapshot was saved without some unreadable files: the backup still
-# happened, so it reports up with the reason in the message. A path of the
-# include list that does not exist only prints a warning and leaves 0.
+# happened, so it reports up with the reason in the message.
 case $status in
     0) message="OK" ;;
     3) message="incomplete snapshot: some files could not be read, see journalctl --user -u restic-backup" ;;
     *) fail "restic backup failed (exit $status)" ;;
 esac
+[[ -n $missing ]] && message+="; not found, so not backed up: $missing"
 
 # Grouping by host alone keeps one chain of snapshots when the include list
 # changes; the default (host and paths) would start a new chain that the

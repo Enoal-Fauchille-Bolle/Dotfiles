@@ -17,8 +17,8 @@ encrypted file can be recovered from an older day.
 
 Only the paths in `restic_include` are backed up. To add one, edit the list
 and run `~/Dotfiles/bootstrap.sh --tags restic`. A listed path that does not
-exist is skipped with a warning in the journal (`does not match any files`),
-and the run still counts as a success.
+exist is skipped (`does not match any files` in the journal), and the run
+still counts as a success: the script names it in the Kuma message instead.
 
 Retention: 7 daily, 4 weekly and 12 monthly snapshots (`restic forget`
 every day, `--prune` on Sundays to free the space on B2). The timer is a
@@ -31,6 +31,8 @@ Report to Kuma, by exit code of `restic backup`:
 - **3** (snapshot saved, some files unreadable): `up`, with the reason in
   the message.
 - **Anything else**, or a failed `forget`: `down`, so Kuma alerts at once.
+- **A path of the include list not found** (renamed or moved folder): still
+  `up`, with the missing paths at the end of the message.
 - **No push for 3 days** (laptop off, timer stopped): Kuma alerts on its own.
 
 ## First setup
