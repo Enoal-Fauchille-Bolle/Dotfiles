@@ -5,8 +5,9 @@ kernel 6.12, GNOME Shell 48 on Wayland, user `enoal` (uid 1000).
 
 Inventory taken read-only on 2026-09-15. It drives the Ansible playbook under
 `ansible/` and its bootstrap command. Personal data (Documents, Projects, ...)
-is out of scope: `scripts/my_scripts/restore.sh` restores it from the external
-disk. Secrets never enter this repository.
+is out of scope: the restic backup restores it (see
+`ansible/roles/services/restic/README.md`). Secrets never enter this
+repository.
 
 Method: `apt-mark showmanual` (282 packages) minus the installer log
 `/var/log/installer/status` (277) and the priority required/important/standard
@@ -178,7 +179,7 @@ login is manual. Empty `~/.zshrc.secrets` and `~/.wakatime.key` created as
 | NetworkManager profiles (9 Wi-Fi, 2 WireGuard) | Contain keys and passwords |
 | `/etc/hosts` entries blocking GitKraken licence domains | Licence-check circumvention, not automated |
 | User `sbolle` and its subuid/subgid range | Another person's account |
-| Dark wallpaper `~/Pictures/AstralRedshift/Desktop Wallpaper.png` | Personal data, restored by `restore.sh` |
+| Dark wallpaper `~/Pictures/AstralRedshift/Desktop Wallpaper.png` | Personal data, restored from the restic backup |
 | Autostart `remmina-applet.desktop` | Launches a flatpak that is no longer installed |
 | Aliases to absent tools: cmatrix, asciiquarium, neofetch, procs, todo.sh, nvim, antigravity | Not installed, by decision; the aliases stay for a later cleanup |
 
@@ -248,8 +249,6 @@ Not part of the playbook. Listed so they are not forgotten.
   (alias `vim`), antigravity.
 - `scripts/my_scripts/system-maintenance.sh` runs `sudo dnf update`; the
   machine is Debian and Fedora is no longer used.
-- `backup.sh` uses `/run/media/$USER/MyDisk`, `restore.sh` uses
-  `/media/$USER/MyDisk`; one of the two paths is wrong.
 - `README.md` still presents Fedora 43 as the primary environment and lists
   the `nix` package; `install.sh` keeps a Fedora branch.
 - `system/` stow package is not in `install.sh` and its `mimeapps.list` has

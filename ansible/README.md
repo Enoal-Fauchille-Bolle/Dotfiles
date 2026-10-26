@@ -82,7 +82,9 @@ Secrets never live in the repository. After the first run:
   and Claude Desktop, Discord, Bitwarden and the other Flatpak apps.
 - `ollama pull qwen3.5:0.8b`.
 - Wi-Fi and WireGuard profiles in NetworkManager.
-- Personal data: `~/my_scripts/restore.sh` from the external disk.
+- Personal data: `restic restore latest --target /`, once
+  `~/.config/restic/env` is filled ("Restore" in
+  `roles/services/restic/README.md`).
 - Reboot. The Zsh login shell, the new groups (docker, input), the GNOME
   extensions and the Flatpak apps only apply to a fresh session, and logging
   out is not enough: `systemd --user` keeps running as long as any session of
