@@ -1,6 +1,6 @@
 # The unit files come from the `systemd` stow package (install.sh); this role
-# only enables them. A user manager must be running: it is on a desktop
-# session, and lingering provides one in test containers.
+# enables them and starts the timers. A user manager must be running: it is on
+# a desktop session, and lingering provides one in test containers.
 
 - name: Start a user manager without a login session (containers only)
   ansible.builtin.command: "loginctl enable-linger {{ user_name }}"
@@ -9,11 +9,14 @@
   become: true
   when: is_container | bool
 
-- name: Enable the user units
+# Enabling alone waits for the next login: on a laptop that stays up for days,
+# a new timer would not fire until then. Services are left as they are.
+- name: Enable the user units and start the timers
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     scope: user
     enabled: yes
+    state: "{{ 'started' if item.endswith('.timer') else omit }}"
     daemon_reload: yes
   loop: "{{ systemd_user_units_enabled }}"
   environment:
