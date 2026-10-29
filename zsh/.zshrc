@@ -256,7 +256,14 @@ esac
 
 # Homebrew - provides a git recent enough (>= 2.54) for the config-based hooks
 # declared in .gitconfig. Guarded so machines without Homebrew start cleanly.
-[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# brew shellenv prepends its bin dirs, which would shadow the Debian tools (curl,
+# openssl, python3...) with copies that apt does not patch, so they are moved to
+# the end of PATH. git and betterleaks still resolve to Homebrew through the
+# /usr/local/bin symlinks that Ansible creates (homebrew_system_links).
+[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && {
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  path=(${path:#/home/linuxbrew/.linuxbrew/(bin|sbin)} /home/linuxbrew/.linuxbrew/bin /home/linuxbrew/.linuxbrew/sbin)
+}
 
 # Tirith
 # eval "$(tirith init --shell zsh)"
