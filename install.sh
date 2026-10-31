@@ -77,13 +77,14 @@ done
 # 3. Setup Secrets File (Local only)
 if [ ! -f "$SECRETS_FILE" ]; then
     echo "🔒 Creating empty secrets file at $SECRETS_FILE..."
-    touch "$SECRETS_FILE"
+    (umask 077 && touch "$SECRETS_FILE")
     echo "# Place your secrets here (API Keys, Tokens, etc.)" >> "$SECRETS_FILE"
     echo "# export NPM_TOKEN='...'" >> "$SECRETS_FILE"
     echo "📝 REMINDER: Don't forget to fill $SECRETS_FILE with your actual tokens manually!"
 else
     echo "🔑 Secrets file already exists. Skipping."
 fi
+chmod 600 "$SECRETS_FILE"
 
 # 4. Setup WakaTime Key File (Local only)
 # .wakatime.cfg reads the key through api_key_vault_cmd, so the key itself never
