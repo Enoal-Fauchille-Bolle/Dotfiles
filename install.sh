@@ -6,7 +6,6 @@ DOTFILES_DIR="$HOME/Dotfiles"
 PACKAGES=(
     zsh
     git
-    clang-format
     npm
     wakatime
     ssh

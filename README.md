@@ -63,7 +63,6 @@ This project uses GNU Stow to manage packages. Each top-level directory represen
 ```text
 ~/Dotfiles
 ├── atuin           # Shell history (SQLite backed, synced across machines)
-├── clang-format    # Epitech C/C++ coding style
 ├── claude          # Claude Code configuration
 ├── git             # Git global configuration and ignores
 ├── nix             # Nix package manager channels
