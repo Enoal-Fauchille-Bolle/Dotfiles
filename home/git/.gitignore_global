@@ -13,9 +13,6 @@ a.out
 *.todo
 unit_tests
 unit_tests.out
-main
-temp/
-samples/
 organization/
 Subject.*
 ncurses.sh
