@@ -150,7 +150,7 @@ alias kctl="kubectl"
 alias ch='claude-history'
 
 # Others
-alias edit-rc="~/my_scripts/edit_zshrc.sh"
+alias edit-rc='code ~/Dotfiles/zsh/.zshrc'
 alias refresh-rc="source ~/.zshrc"
 alias create-shortcut="ln -sf"
 alias op="chmod 744"
