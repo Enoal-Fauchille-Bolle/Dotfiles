@@ -14,7 +14,6 @@ PACKAGES=(
     nix
     atuin
     claude
-    system
     input-remapper
     systemd
     desktop
