@@ -21,6 +21,7 @@ PACKAGES=(
 )
 SECRETS_FILE="$HOME/.zshrc.secrets"
 WAKATIME_KEY_FILE="$HOME/.wakatime.key"
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 
 # Function to detect OS and install stow
 install_stow() {
@@ -31,6 +32,23 @@ install_stow() {
         echo "📦 Debian/Ubuntu detected. Installing stow..."
         sudo apt-get update && sudo apt-get install -y stow
     fi
+}
+
+# Moves a regular file standing where a link must go out of the way. stow
+# --adopt would pull it into this repository instead, overwriting the tracked
+# version. -ef skips a file that already is the repository one, reached through
+# a folded directory link.
+backup_conflicts() {
+    local pkg="$1" file relative target
+    while IFS= read -r -d '' file; do
+        relative="${file#"$pkg"/}"
+        target="$HOME/$relative"
+        if [ -f "$target" ] && [ ! -L "$target" ] && [ ! "$target" -ef "$file" ]; then
+            mkdir -p "$BACKUP_DIR/$(dirname "$relative")"
+            mv "$target" "$BACKUP_DIR/$relative"
+            echo "📦 Moved $target to $BACKUP_DIR"
+        fi
+    done < <(find "$pkg" -type f -print0)
 }
 
 # Main execution
@@ -46,10 +64,11 @@ cd "$DOTFILES_DIR" || exit
 for pkg in "${PACKAGES[@]}"; do
     if [ -d "$pkg" ]; then
         echo "🔗 Stowing $pkg..."
-        # -R restows (refreshes links), --adopt takes over existing files,
-        # --no-folding links files one by one so directories such as ~/.local or
-        # ~/.claude stay real directories instead of links into this repository.
-        stow -R --adopt --no-folding "$pkg"
+        backup_conflicts "$pkg"
+        # -R restows (refreshes links), --no-folding links files one by one so
+        # directories such as ~/.local or ~/.claude stay real directories instead
+        # of links into this repository.
+        stow -R --no-folding "$pkg"
     else
         echo "⚠️  Warning: $pkg not found"
     fi
