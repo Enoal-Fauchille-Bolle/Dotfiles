@@ -3,8 +3,7 @@
 Rebuilds the laptop (Debian 13, GNOME) from a fresh install: apt repositories
 and packages, system settings, Zsh and the stow-managed dotfiles, language
 toolchains, Flatpak applications, GNOME extensions and settings, fonts, and
-the services. The inventory it was built from, with what was left out and
-why, is in `../docs/laptop-inventory.md`.
+the services.
 
 ## Usage
 
@@ -76,7 +75,8 @@ Secrets never live in the repository. After the first run:
   key, `restic init` and Kuma monitor steps are in
   `roles/services/restic/README.md`.
 - SSH keys: restore `~/.ssh/id_ed25519` and `.pub` (git commit signing uses
-  the public key).
+  the public key). The private host list in `~/.ssh/config.d/` comes back with
+  the restic restore: the tracked `~/.ssh/config` only includes it.
 - Logins: `sudo tailscale up`, `gh auth login`, `atuin login`, VS Code
   (Settings Sync restores extensions and profiles), GitKraken, Claude Code
   and Claude Desktop, Discord, Bitwarden and the other Flatpak apps.
