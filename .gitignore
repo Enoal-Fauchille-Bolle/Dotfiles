@@ -6,4 +6,4 @@ __pycache__/
 # project repository and wrong for this one: here it is the configuration being
 # shipped, not a generated instruction file. A repository .gitignore is read
 # after core.excludesFile, so this re-inclusion wins.
-!claude/.claude/CLAUDE.md
+!home/claude/.claude/CLAUDE.md

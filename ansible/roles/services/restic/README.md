@@ -10,7 +10,7 @@ encrypted file can be recovered from an older day.
 
 | File | Source | Role |
 |---|---|---|
-| `~/my_scripts/restic-backup.sh` | `scripts` stow package | backup, retention, report to Kuma |
+| `~/.local/bin/restic-backup.sh` | `scripts` stow package | backup, retention, report to Kuma |
 | `~/.config/systemd/user/restic-backup.{service,timer}` | `systemd` stow package | daily run, caught up at the next login when missed |
 | `~/.config/restic/include`, `exclude` | this role, from `restic_include` and `restic_exclude` in `group_vars/all.yml` | what is backed up |
 | `~/.config/restic/env` | this role, created with comments only | repository, keys, password, Kuma URL |

@@ -15,9 +15,9 @@
 
 - name: Ask stow which links are still missing (dry run)
   ansible.builtin.shell: |
-    stow -n -v {{ stow_packages.stdout }} 2>&1 | grep -E '^(LINK|UNLINK|MKDIR|CONFLICT)' || true
+    stow -n -v --no-folding -t {{ user_home }} {{ stow_packages.stdout }} 2>&1 | grep -E '^(LINK|UNLINK|MKDIR|CONFLICT)' || true
   args:
-    chdir: "{{ dotfiles_dir }}"
+    chdir: "{{ dotfiles_dir }}/home"
   register: stow_pending
   changed_when: false
 

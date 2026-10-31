@@ -56,15 +56,16 @@ if ! command -v stow &> /dev/null; then
 fi
 
 # 2. Run Stow for each package
-cd "$DOTFILES_DIR" || exit
+cd "$DOTFILES_DIR/home" || exit
 for pkg in "${PACKAGES[@]}"; do
     if [ -d "$pkg" ]; then
         echo "🔗 Stowing $pkg..."
         backup_conflicts "$pkg"
         # -R restows (refreshes links), --no-folding links files one by one so
         # directories such as ~/.local or ~/.claude stay real directories instead
-        # of links into this repository.
-        stow -R --no-folding "$pkg"
+        # of links into this repository. -t is required: the default target is
+        # the parent of the current directory, which is the repository itself.
+        stow -R --no-folding -t "$HOME" "$pkg"
     else
         echo "⚠️  Warning: $pkg not found"
     fi

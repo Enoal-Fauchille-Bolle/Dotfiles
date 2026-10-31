@@ -3,4 +3,4 @@ Description=Check battery level and notify Discord when low
 
 [Service]
 Type=oneshot
-ExecStart=%h/my_scripts/battery-discord-notify.sh
+ExecStart=%h/.local/bin/battery-discord-notify.sh

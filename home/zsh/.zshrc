@@ -54,7 +54,7 @@ alias kctl="kubectl"
 alias ch='claude-history'
 
 # Others
-alias edit-rc='code ~/Dotfiles/zsh/.zshrc'
+alias edit-rc='code ~/Dotfiles/home/zsh/.zshrc'
 alias refresh-rc="source ~/.zshrc"
 alias create-shortcut="ln -sf"
 alias op="chmod 744"
@@ -65,9 +65,6 @@ alias vencord='sh -c "$(curl -sS https://vencord.dev/install.sh)"'
 alias docker-compose="docker compose"
 
 ##############################################################################
-
-# Add my_scripts to PATH
-export PATH="$HOME/my_scripts:$PATH"
 
 # Less configuration
 export LESS="-RFMiS --incsearch --use-color -j.5"
