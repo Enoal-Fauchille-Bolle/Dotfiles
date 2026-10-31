@@ -202,6 +202,9 @@ homebrew_system_links:
 pip_user_packages:
   - diff-cover
   - Pygments
+uv_version: 0.12.17
+uv_tools:
+  - { name: claude-usage, source: "git+https://github.com/Enoal-Fauchille-Bolle/claude-usage" }
 
 kubectl_version: v1.36.3
 helm_version: v4.2.4

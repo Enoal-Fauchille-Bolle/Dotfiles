@@ -5,3 +5,18 @@
     name: "{{ pip_user_packages }}"
     executable: pip3
     extra_args: --user --break-system-packages
+
+# UV_NO_MODIFY_PATH: the installer would edit .zshrc, which already adds ~/.local/bin.
+- name: Install uv
+  ansible.builtin.shell: |
+    curl -LsSf https://astral.sh/uv/{{ uv_version }}/install.sh | env UV_NO_MODIFY_PATH=1 sh
+  args:
+    creates: "{{ user_home }}/.local/bin/uv"
+
+- name: Install the uv tools
+  ansible.builtin.command: "{{ user_home }}/.local/bin/uv tool install {{ item.source }}"
+  args:
+    creates: "{{ user_home }}/.local/bin/{{ item.name }}"
+  loop: "{{ uv_tools }}"
+  loop_control:
+    label: "{{ item.name }}"
