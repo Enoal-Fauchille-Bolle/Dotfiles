@@ -1,0 +1,120 @@
+{
+  "cleanupPeriodDays": 99999,
+  "model": "sonnet",
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-notifier-on-permission.js\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-notifier-on-question.js\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-notifier-on-stop.js\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-notifier-on-subagent-stop.js\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-notifier-on-prompt.js\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/budget-guard.sh\""
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash \"$HOME/.claude/statusline-command.sh\""
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false,
+    "context7@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
+    "gitlab@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "typescript-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-code-wakatime@wakatime": true,
+    "code-review@claude-plugins-official": false,
+    "github@claude-plugins-official": false,
+    "explanatory-output-style@claude-plugins-official": true,
+    "atlassian-mcp@anthropic-plugin-directory": true
+  },
+  "extraKnownMarketplaces": {
+    "wakatime": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/wakatime/claude-code-wakatime.git"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "syntaxHighlightingDisabled": false,
+  "modelSettings": {
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "askUserQuestionTimeout": "never",
+  "dialogExpiry": "never",
+  "tui": "fullscreen",
+  "timeFormat": "24-hour",
+  "theme": "auto",
+  "editorMode": "normal",
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": false,
+  "switchModelsOnFlag": false,
+  "autoContinueAtUsageLimit": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "useAutoModeDuringPlan": true
+}
