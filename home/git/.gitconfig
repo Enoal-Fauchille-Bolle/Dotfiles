@@ -6,10 +6,9 @@
 [user]
 	name = Enoal Fauchille-Bolle
 	email = enoal.fauchille-bolle@epitech.eu
-    signingkey = /home/enoal/.ssh/id_ed25519.pub
+    signingkey = ~/.ssh/id_ed25519.pub
 [core]
-    excludesfile = /home/enoal/.gitignore_global
-    attributesfile = /home/enoal/.gitattributes
+    excludesfile = ~/.gitignore_global
     pager = delta
 	editor = nano
 [init]
