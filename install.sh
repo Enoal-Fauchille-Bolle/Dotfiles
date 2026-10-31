@@ -6,11 +6,9 @@ DOTFILES_DIR="$HOME/Dotfiles"
 PACKAGES=(
     zsh
     git
-    npm
     wakatime
     ssh
     scripts
-    nix
     atuin
     claude
     input-remapper

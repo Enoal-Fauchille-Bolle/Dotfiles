@@ -98,9 +98,6 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 
-# Nix
-# . $HOME/.nix-profile/etc/profile.d/nix.sh
-
 # Load secrets if the file exists
 [ -f "$HOME/.zshrc.secrets" ] && source "$HOME/.zshrc.secrets"
 

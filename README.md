@@ -65,8 +65,6 @@ This project uses GNU Stow to manage packages. Each top-level directory represen
 ├── atuin           # Shell history (SQLite backed, synced across machines)
 ├── claude          # Claude Code configuration
 ├── git             # Git global configuration and ignores
-├── nix             # Nix package manager channels
-├── npm             # NPM configuration and tokens
 ├── scripts         # Personal executables and utility scripts
 ├── ssh             # SSH configuration (config file only, no keys)
 ├── wakatime        # Wakatime configuration for time tracking
