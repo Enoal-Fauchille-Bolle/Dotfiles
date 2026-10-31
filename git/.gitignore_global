@@ -26,8 +26,6 @@ compile_commands.*.json
 .clangd
 coverage.json
 coverage/
-pnpm-lock.yaml
-pnpm-workspace.yaml
 .github/copilot-instructions.md
 AGENTS.md
 SPECIFICATIONS.md
