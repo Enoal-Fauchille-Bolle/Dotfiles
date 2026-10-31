@@ -129,89 +129,35 @@ source $ZSH/oh-my-zsh.sh
 
 # Git
 alias gits='git status'
-alias gitp="git stash && git pull && git stash pop"
-alias gitph='git push'
-alias gitpl='git pull'
-
-# Make
-alias makef='make fclean -s'
-alias remake='make -s'
-alias makerel="make fclean -s && make -s"
-# alias make='bear -- make'
-# alias makef='bear -- make fclean -s'
-# alias remake='bear -- make -s'
-# alias makerel="bear -- make fclean -s && bear -- make -s"
-
-# Documentation
-alias documentations="echo 'Coding Style Rules: coding-style-rules\nTmux Shortcuts: tmux-shortcuts\nEmacs Shortcuts: emacs-shortcuts\nNVIM Shortcuts: nvim-shortcuts\nCommon C Stumper Errors: common-c-stumper-errors\nCommon C Errors: common-c-errors'"
-alias coding-style-rules="nano ~/Documents/C\ Coding\ Style.txt"
-alias tmux-shortcuts="nano ~/Documents/Tmux\ Shortcuts.txt"
-alias emacs-shortcuts="nano ~/Documents/Emacs\ Shortcuts.txt"
-alias nvim-shortcuts="nano ~/Documents/NVIM\ Shortcuts.txt"
-alias common-c-stumper-errors="nano ~/Documents/Common\ C\ Stumper\ Errors.txt"
-alias common-c-errors="nano ~/Documents/Common\ C\ Errors.txt"
-
-# Shit
-alias jaaj='yes JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJ'
-alias tpd='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
-alias lsd="yes ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ | lolcat"
-alias matrix='cmatrix'
-alias aquarium='asciiquarium'
 
 # Tools
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -l --icons --group-directories-first --git'
-alias la='eza -la --icons --group-directories-first --git'
 alias tree='eza --tree --icons'
 # alias ccat='bat --style=auto'
 # alias ffind='fd'
 # alias du='dust'
 alias top='btop'
-alias ps='procs'
 alias k9s='k9s --splashless --all-namespaces'
 
 # Code Utility
-alias delivery="cd ~/Delivery/Projects"
 alias emacs='emacs -nw'
 alias cl='clear'
 alias ter='(ptyxis --new-window --working-directory="$(pwd)" > /dev/null 2>&1 &)'
-alias exitcode='echo $?'
-alias csc='bananapy'
 alias d="docker"
 alias dc="docker compose"
-alias unit_tests_report="gcovr --exclude tests/ && gcovr -b --exclude tests/"
-alias count-project-lines="find . -type f -name \"*.c\" ! -path \"*/libs/*\" -print0 | xargs -0 wc -l"
-alias count-project-lines-with-libs="find . -type f -name \"*.c\" -print0 | xargs -0 wc -l"
-alias vg="valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes"
-alias complete-recent-discord-quest="cat ~/Documents/complete-recent-discord-quest.js | xclip -selection clipboard"
 alias kctl="kubectl"
-alias end="notify-send --urgency=low 'Finished'"
-alias ag="antigravity"
-alias claude2='CLAUDE_CONFIG_DIR=~/.claude2 claude'
 alias ch='claude-history'
 
 # Others
-alias f="fuck"
 alias edit-rc="~/my_scripts/edit_zshrc.sh"
 alias refresh-rc="source ~/.zshrc"
 alias create-shortcut="ln -sf"
-alias root="sudo nautilus /"
 alias op="chmod 744"
-alias info="neofetch"
-alias vim="nvim"
-alias only="&& exit"
 alias update="sudo apt update && sudo apt upgrade -y"
-alias full-update="sudo apt update && sudo apt full-upgrade"
-alias cop="ghcs"
-alias azerdev-host="ssh azerty@azerdev.live"
-alias myip="curl https://ipinfo.io/ip && echo ''"
 alias vencord='sh -c "$(curl -sS https://vencord.dev/install.sh)"'
 # alias cd="z"
 # alias cdi="zi"
-alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
-alias t="todo.sh"
-alias clipboard="xclip -selection clipboard"
-alias cb="clipboard"
 alias docker-compose="docker compose"
 
 ##############################################################################
