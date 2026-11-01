@@ -1,12 +1,42 @@
 # The script comes from the `scripts` stow package and the units from the
 # `systemd` one; services/user_units enables the timer. This role installs
-# restic and writes its configuration. Setup and restore: README.md.
+# restic and writes its configuration, and installs rustic, which only
+# browses the repository (`rustic-browse`, from the `scripts` package).
+# Setup and restore: README.md.
 
 - name: Install restic
   ansible.builtin.apt:
     name: restic
     state: present
   become: true
+
+- name: Create the rustic directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}"
+    state: directory
+    mode: '0755'
+
+# get_url checks the checksum; unarchive alone cannot.
+- name: Download rustic (viewer for the restic repository)
+  ansible.builtin.get_url:
+    url: "https://github.com/rustic-rs/rustic/releases/download/{{ rustic_version }}/rustic-{{ rustic_version }}-x86_64-unknown-linux-gnu.tar.gz"
+    dest: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}/rustic.tar.gz"
+    checksum: "sha256:{{ rustic_sha256 }}"
+    mode: '0644'
+
+- name: Unpack rustic
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}/rustic.tar.gz"
+    dest: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}"
+    remote_src: yes
+    include: [rustic]
+    creates: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}/rustic"
+
+- name: Link rustic into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ user_home }}/.local/opt/rustic-{{ rustic_version }}/rustic"
+    dest: "{{ user_home }}/.local/bin/rustic"
+    state: link
 
 - name: Create the restic config directory
   ansible.builtin.file:

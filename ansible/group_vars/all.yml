@@ -309,6 +309,12 @@ systemd_user_units_enabled:
   - battery-discord.timer
   - restic-backup.timer
 
+# rustic only browses the restic repository (rustic-browse); restic keeps
+# doing the backups. The checksum is the one GitHub publishes for the
+# x86_64-unknown-linux-gnu archive of the release: update both together.
+rustic_version: v0.11.4
+rustic_sha256: c20bc3682c6275de3cfbc9317101dca5c0800a2fb5c610d0f9ef2addfd27cf81
+
 # What restic-backup.sh sends to the repository, relative to the home
 # directory. Only these paths are backed up; everything else (caches,
 # ~/.config, tools the playbook reinstalls) is left out.
