@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Opens the restic repository with rustic, to browse the snapshots in a
+# terminal UI. rustic reads the same repository format as restic, so
+# restic-backup.sh keeps doing the backups and the retention; this script is
+# only a viewer and never needs the backup timer to be stopped.
+# Usage: rustic-browse [rustic arguments]   (default: snapshots --interactive)
+#   rustic-browse ls latest --interactive      browse the files of a snapshot
+#   rustic-browse diff <snapshot> <snapshot> --interactive
+# Do not mark snapshots for removal in the UI: restic-backup.sh owns the
+# retention policy.
+set -euo pipefail
+
+ENV_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/restic/env"
+[[ -r "$ENV_FILE" ]] || { echo "$ENV_FILE is missing" >&2; exit 1; }
+# shellcheck source=/dev/null
+source "$ENV_FILE"
+
+for var in RESTIC_REPOSITORY RESTIC_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+    [[ -n "${!var:-}" ]] || { echo "$var is not set in $ENV_FILE" >&2; exit 1; }
+done
+[[ $RESTIC_REPOSITORY == s3:https://*/* ]] \
+    || { echo "RESTIC_REPOSITORY must look like s3:https://<host>/<bucket>" >&2; exit 1; }
+
+# restic takes the repository as one URL, rustic wants the pieces apart:
+# s3:https://s3.<region>.backblazeb2.com/<bucket>[/<prefix>]
+url=${RESTIC_REPOSITORY#s3:https://}
+host=${url%%/*}
+path=${url#*/}
+bucket=${path%%/*}
+prefix=/
+[[ $path == */* ]] && prefix=/${path#*/}
+region=${host#s3.}
+region=${region%%.*}
+
+# rustic reads its profile from the current directory. The profile holds the
+# B2 keys, so it lives in a private directory on the tmpfs of the session and
+# disappears when rustic exits.
+umask 077
+workdir=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/rustic-browse.XXXXXX")
+trap 'rm -rf "$workdir"' EXIT
+cat > "$workdir/browse.toml" <<EOF
+[repository]
+repository = "opendal:s3"
+
+[repository.options]
+endpoint = "https://$host"
+region = "$region"
+bucket = "$bucket"
+root = "$prefix"
+access_key_id = "$AWS_ACCESS_KEY_ID"
+secret_access_key = "$AWS_SECRET_ACCESS_KEY"
+EOF
+
+export RUSTIC_PASSWORD=$RESTIC_PASSWORD
+unset RESTIC_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY KUMA_PUSH_URL
+
+((${#} > 0)) || set -- snapshots --interactive
+cd "$workdir"
+rustic -P browse "$@"

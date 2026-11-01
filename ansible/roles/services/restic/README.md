@@ -71,6 +71,27 @@ restic snapshots                                   # history
 restic ls latest /home/$USER/Documents             # browse a snapshot
 ```
 
+## Browse the snapshots
+
+`rustic-browse` opens the repository in [rustic](https://rustic.cli.rs), a
+restic-compatible tool with a terminal UI. rustic reads the same repository
+format, so restic keeps the backups and the retention, and rustic only
+looks. The script reads `~/.config/restic/env`, passes the repository, keys
+and password to rustic in its own format, and removes the temporary profile
+on exit.
+
+```bash
+rustic-browse                                 # list of snapshots
+rustic-browse ls latest --interactive         # files of a snapshot
+rustic-browse diff <snapshot> <snapshot> --interactive   # compare two snapshots
+```
+
+The first opening is slow, since the index and the directory data are read
+from B2; rustic keeps a local cache for the next ones. The UI can mark
+snapshots for removal: leave that to `restic-backup.sh`, which owns the
+retention policy. rustic is installed from the pinned GitHub release
+(`rustic_version` and `rustic_sha256` in `group_vars/all.yml`).
+
 ## Restore
 
 Every command below needs `source ~/.config/restic/env` first. On a new
