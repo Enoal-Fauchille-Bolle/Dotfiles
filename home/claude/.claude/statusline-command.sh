@@ -244,7 +244,7 @@ out="${out} ${DIM}|${RESET} ${velocity}"
 
 # ── Line 2: official plan usage limits (from the payload's rate_limits) ──
 # Claude Code >= 2.1 provides the real 5-hour and 7-day rate-limit usage
-# percentages plus their reset timestamps — the same figures as `/usage`.
+# percentages plus their reset timestamps, the same figures as `/usage`.
 # No external tool, no network, no dollars: read straight from stdin JSON.
 
 # Render one limit segment: <emoji> <label> <percent> <resets_at_epoch> <window_secs>.

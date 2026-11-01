@@ -36,7 +36,7 @@ if [[ "$status" != "Discharging" ]]; then
 fi
 
 if (( capacity <= CRITICAL )) && [[ "$last" != critical ]]; then
-    notify ":rotating_light: Batterie critique : ${capacity}% — branche le chargeur."
+    notify ":rotating_light: Batterie critique : ${capacity}%, branche le chargeur."
     printf 'critical' > "$STATE"
 elif (( capacity <= LOW )) && [[ "$last" == none ]]; then
     notify ":warning: Batterie faible : ${capacity}%."

@@ -4,7 +4,7 @@ When you write explanations, please explain so anyone can understand, even if th
 You must never take any decision for me, and you must never make any assumptions about my preferences or intentions.
 When you ask me questions, always explain the options and always give your recommendation and why.
 You should never commit on my behalf, instead, you should provide me short commit messages that respect perfectly the commit convention and the previous commit messages. If there are multiple commits to do, you should always specify the exact lines for each commit, not the parts, always the lines.
-Before you answer anything about a library, framework, SDK or CLI tool — its API, its configuration, a migration between versions — look the documentation up with context7 instead of answering from memory. Do this even when you are confident: your training cutoff is fixed and these move, so a plausible but stale signature costs me far more than the lookup costs you. Say in your answer whether you checked or answered from memory.
+Before you answer anything about a library, framework, SDK or CLI tool (its API, its configuration, a migration between versions), look the documentation up with context7 instead of answering from memory. Do this even when you are confident: your training cutoff is fixed and these move, so a plausible but stale signature costs me far more than the lookup costs you. Say in your answer whether you checked or answered from memory.
 When a command needs root on my laptop (hostname `hp-elitebook-g9`, no `$SSH_CONNECTION`), suggest `! pkexec <command>`, never `! sudo <command>`: `sudo` cannot read my password through the `!` prompt and fails, whereas `pkexec` opens a graphical password dialog. Over SSH, never suggest `pkexec`.
 
 ## Hygiène de session
@@ -31,7 +31,7 @@ normal : ne le signale pas.
 Signale-le **une fois, en tête de réponse, en deux lignes au plus**, puis fais le
 travail demandé. Ce n'est ni un refus ni un motif de sermon répété à chaque tour.
 
-Sans attendre le hook, quand tu l'observes toi-même — et là aussi avant de
+Sans attendre le hook, quand tu l'observes toi-même, et là aussi avant de
 travailler, pas après :
 
 - **Je change de sujet** : le dire. Une session = une tâche ; `/clear` est gratuit.
@@ -49,7 +49,7 @@ travailler, pas après :
   chargé, il reste jusqu'à la fin de la conversation.
 - **Je pose une question hors sujet** : me rappeler `/btw`, dont la réponse
   n'entre jamais dans l'historique.
-- **Tu me proposes un `/export`** : toujours avec un chemin, jamais nu —
+- **Tu me proposes un `/export`** : toujours avec un chemin, jamais nu :
   `/export ~/.claude/exports/<projet>/conversations/<sujet>-<AAAA-MM-JJ>.md`,
   où `<projet>` est un dossier existant de `~/.claude/exports/` (index dans
   son `README.md`). Sans argument il atterrit dans le dossier courant, qui est
