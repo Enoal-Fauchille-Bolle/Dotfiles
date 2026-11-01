@@ -10,22 +10,22 @@ When a command needs root on my laptop (hostname `hp-elitebook-g9`, no `$SSH_CON
 ## Hygiène de session
 
 Tu ne vois pas le remplissage de ta fenêtre de contexte : aucun hook ne reçoit
-ce chiffre. Le hook `~/.claude/hooks/budget-guard.sh` te l'injecte sous la forme
+ce chiffre. Le hook `claude-usage guard` te l'injecte sous la forme
 d'une ligne `[budget]`, uniquement quand un seuil est franchi. Ces noms sont ta
 seule mesure ; en leur absence, ne devine pas de pourcentage et n'invente pas
 d'alerte. Ce que chacun t'oblige à me dire :
 
 | Seuil | Ce que tu me réponds |
 | --- | --- |
-| `CONTEXTE_DECISION` | ~150k. Même tâche → propose `/compact <consignes>`. Autre tâche → `/clear`. |
-| `CONTEXTE_STOP` | ~300k. Propose `/clear`, et le handoff juste avant. |
-| `COUT` | ≥ 15 $ : un tiers d'une fenêtre 5 h dans cette seule conversation. |
+| `CONTEXT_DECISION` | ~150k. Même tâche → propose `/compact <consignes>`. Autre tâche → `/clear`. |
+| `CONTEXT_STOP` | ~300k. Propose `/clear`, et le handoff juste avant. |
+| `COST` | ≥ 15 $ : un tiers d'une fenêtre 5 h dans cette seule conversation. |
 | `QUOTA_5H` | Plus de 10 points d'avance sur le rythme, ou ≥ 90 % : ne pas ouvrir de nouveau chantier, terminer celui en cours. |
 | `QUOTA_7D` | Plus de 10 points d'avance sur le rythme, ou ≥ 90 % : je bascule de compte ou je lève le pied. |
-| `CACHE_FROID` | La prochaine requête réécrit tout le contexte à prix double. |
+| `COLD_CACHE` | La prochaine requête réécrit tout le contexte à prix double. |
 
-Le rythme est la part de la fenêtre déjà écoulée : le trait bleu de ma status line.
-Un pourcentage élevé avec un écart négatif, comme `73 % (rythme 77 %, -4)`, est
+Le rythme (`pace`) est la part de la fenêtre déjà écoulée : le trait bleu de ma status line.
+Un pourcentage élevé avec un écart négatif, comme `73% (pace 77%, -4)`, est
 normal : ne le signale pas.
 
 Signale-le **une fois, en tête de réponse, en deux lignes au plus**, puis fais le

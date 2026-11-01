@@ -52,7 +52,7 @@
           },
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/budget-guard.sh\""
+            "command": "\"$HOME/.local/bin/claude-usage\" guard || exit 1"
           }
         ]
       }

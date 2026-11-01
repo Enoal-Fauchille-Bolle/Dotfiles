@@ -9,9 +9,8 @@ Configuration of a Debian 13 GNOME workstation: dotfiles linked with GNU Stow, a
 3. [Secrets](#secrets)
 4. [Default Applications](#default-applications)
 5. [Node and Project Variables](#node-and-project-variables)
-6. [Claude Code Session Budget](#claude-code-session-budget)
-7. [Post-Installation](#post-installation)
-8. [License](#license)
+6. [Post-Installation](#post-installation)
+7. [License](#license)
 
 ## Installation
 
@@ -62,7 +61,7 @@ Each folder in `home/` mirrors `$HOME`, so `home/zsh/.zshrc` becomes a link at `
 | Package | Contents |
 | --- | --- |
 | `atuin` | Shell history settings. `.zshrc` binds it to `ctrl-r`, and the up arrow keeps its native Zsh behaviour. |
-| `claude` | Claude Code global instructions, settings, status line, budget hook and `/handoff` skill. |
+| `claude` | Claude Code global instructions, settings, status line and `/handoff` skill. The quota history and the budget warnings come from [claude-usage](https://github.com/Enoal-Fauchille-Bolle/claude-usage). |
 | `desktop` | Default applications, the Ptyxis launcher and icon, the `moodledl://` link handler. |
 | `git` | Global Git configuration and ignores. |
 | `input-remapper` | Keyboard and mouse presets, loaded at login. |
@@ -99,15 +98,6 @@ To keep such a change on the next machine, copy its line into the tracked file b
 - **Node version**: set in `home/mise/.config/mise/config.toml`. A project can ask for another one with `.nvmrc` or `.node-version`, and `package.json` is ignored. Only `mise install` downloads a missing version, so cloning a repository never triggers a download.
 - **Graphical programs**: they never read `.zshrc`, so `.zprofile` puts the mise shims on their `PATH`.
 - **Project variables**: go in a `mise.local.toml` at the root of the project, under `[env]`. mise only loads these variables after `mise trust`, and that approval has to be given again after a restore because it is stored in `~/.local/state/mise`.
-
-## Claude Code Session Budget
-
-Claude cannot see how full its own context window is, because no hook receives that number ([claude-code#27969](https://github.com/anthropics/claude-code/issues/27969)). A rule telling it to warn past a threshold would be guesswork. Two files close that gap:
-
-- **`statusline-command.sh`** is the sensor. The status line is the only component handed live context, cost and rate-limit metrics, so it publishes them to `~/.claude/state/ctx-<session>.txt` on every redraw.
-- **`hooks/budget-guard.sh`** is the actuator. It runs on `UserPromptSubmit`, the only event whose stdout becomes context Claude can act on. It reads that state file and falls back to summing the transcript's last assistant turn when the status line has gone stale. Below every threshold it prints nothing, so most prompts cost no extra tokens.
-
-The hook only names the threshold that was crossed. What to do about each one is in `CLAUDE.md`, which is re-injected from disk after every compaction.
 
 ## Post-Installation
 
