@@ -14,3 +14,36 @@
     dest: /usr/local/bin/QDiskInfo
     mode: '0755'
   become: true
+
+- name: Create the directories of the release binaries
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ download_cache }}"
+    - "{{ user_home }}/.local/bin"
+
+# get_url checks the checksum; unarchive alone cannot.
+- name: Download the release binaries
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ download_cache }}/{{ item.url | basename }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
+  loop: "{{ release_binaries }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Unpack the release binaries
+  ansible.builtin.unarchive:
+    src: "{{ download_cache }}/{{ item.url | basename }}"
+    dest: "{{ user_home }}/.local/bin"
+    remote_src: yes
+    include: ["{{ item.member }}"]
+    extra_opts: ["--strip-components={{ item.strip | default(0) }}"]
+    creates: "{{ user_home }}/.local/bin/{{ item.name }}"
+    mode: '0755'
+  loop: "{{ release_binaries }}"
+  loop_control:
+    label: "{{ item.name }}"

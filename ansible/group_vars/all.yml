@@ -96,6 +96,7 @@ apt_packages_desktop:
   - dconf-cli
   - fontconfig
   - zenity
+  - ffmpeg
 
 # Third-party repositories, written in deb822 format under
 # /etc/apt/sources.list.d/<name>.sources. signed_by is a URL, except for
@@ -202,8 +203,12 @@ pip_user_packages:
   - diff-cover
   - Pygments
 uv_version: 0.12.17
+# bin is the command that proves a tool is installed, when it differs from name.
 uv_tools:
   - { name: claude-usage, source: "git+https://github.com/Enoal-Fauchille-Bolle/claude-usage" }
+  - name: free-claude-code
+    bin: fcc-server
+    source: https://github.com/Alishahryar1/free-claude-code/archive/refs/heads/main.zip
 
 kubectl_version: v1.36.3
 helm_version: v4.2.4
@@ -211,6 +216,26 @@ k9s_version: v0.51.0
 
 sshm_version: v1.11.0
 qdiskinfo_version: "0.4"
+
+# Archives kept here are not downloaded again by the next run.
+download_cache: "{{ user_home }}/.cache/dotfiles-downloads"
+
+# Single binaries unpacked into ~/.local/bin. The checksum is the one GitHub
+# publishes for the asset: update it with the version.
+release_binaries:
+  - name: mdcat
+    url: https://github.com/BIRSAx2/mdcat/releases/download/mdcat-2.18.0/mdcat-2.18.0-x86_64-unknown-linux-gnu.tar.gz
+    sha256: 7020f242175bdaa5dc9250e5564bfc8ae9099eadc66f4c38c9887b19cc046291
+    member: mdcat-2.18.0-x86_64-unknown-linux-gnu/mdcat
+    strip: 1
+  - name: msgvault
+    url: https://github.com/wesm/msgvault/releases/download/v0.20.0/msgvault_0.20.0_linux_amd64.tar.gz
+    sha256: 6b99f03f41fe0b375f19b2f9202b35d72a11b30da1a51f50c48503b299305e0c
+    member: msgvault
+  - name: tuicr
+    url: https://github.com/agavra/tuicr/releases/download/v0.27.0/tuicr-0.27.0-x86_64-unknown-linux-gnu.tar.gz
+    sha256: 851c7671d85fd20dc77d30321b201093af9dcdfe45011ad1d51ae65a229da192
+    member: tuicr
 
 claude_marketplaces:
   - anthropics/claude-plugins-official
@@ -252,6 +277,7 @@ flatpak_apps:
       - com.google.Chrome
       - com.mattjakeman.ExtensionManager
       - com.protonvpn.www
+      - com.spotify.Client
       - com.termius.Termius
       - dev.vencord.Vesktop
       - md.obsidian.Obsidian

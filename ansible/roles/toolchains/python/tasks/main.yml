@@ -16,7 +16,7 @@
 - name: Install the uv tools
   ansible.builtin.command: "{{ user_home }}/.local/bin/uv tool install {{ item.source }}"
   args:
-    creates: "{{ user_home }}/.local/bin/{{ item.name }}"
+    creates: "{{ user_home }}/.local/bin/{{ item.bin | default(item.name) }}"
   loop: "{{ uv_tools }}"
   loop_control:
     label: "{{ item.name }}"

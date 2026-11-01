@@ -117,6 +117,6 @@ Run `bootstrap.sh` there, reboot, then check:
 | Ollama | `systemctl status ollama` active; `ollama list` works |
 | User units | `systemctl --user status sniper-mouse.service battery-discord.timer restic-backup.timer` (the mouse daemon needs the Bluetooth mouse; it retries every 3 s until then) |
 | input-remapper | the `Sniper` preset loads for the BT5.0 mouse at login |
-| Flatpak | the 24 apps appear in the app grid; Chrome sees `~` read-only in its sandbox (`flatpak override --user --show com.google.Chrome`) |
+| Flatpak | the 25 apps appear in the app grid; Chrome sees `~` read-only in its sandbox (`flatpak override --user --show com.google.Chrome`) |
 | MIME | links open in Chrome, videos in VLC, `claude://` links in Claude Desktop |
 | Idempotence | a second `bootstrap.sh` run ends with `changed=0` |
