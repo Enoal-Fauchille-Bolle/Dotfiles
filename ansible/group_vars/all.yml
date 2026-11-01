@@ -205,13 +205,14 @@ homebrew_system_links:
 pip_user_packages:
   - diff-cover
   - Pygments
-uv_version: 0.12.17
+uv_version: 0.13.6
 # bin is the command that proves a tool is installed, when it differs from name.
 uv_tools:
   - { name: claude-usage, source: "git+https://github.com/Enoal-Fauchille-Bolle/claude-usage" }
+  # Needs uv 0.13.6 or later. A git source, because its version comes from the tag.
   - name: free-claude-code
     bin: fcc-server
-    source: https://github.com/Alishahryar1/free-claude-code/archive/refs/heads/main.zip
+    source: "git+https://github.com/Alishahryar1/free-claude-code@v6.18.5"
 
 # Each checksum belongs to the version above it: update both together. They come
 # from dl.k8s.io and get.helm.sh, from the GitHub release assets, and for QDiskInfo,
