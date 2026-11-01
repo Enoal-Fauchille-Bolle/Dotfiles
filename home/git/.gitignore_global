@@ -32,4 +32,5 @@ __pycache__/
 .aic.toml
 .claude/settings.local.json
 .mcp.json
+mise.local.toml
 
