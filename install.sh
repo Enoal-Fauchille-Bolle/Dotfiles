@@ -22,10 +22,7 @@ BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 
 # Function to detect OS and install stow
 install_stow() {
-    if [ -f /etc/fedora-release ]; then
-        echo "📦 Fedora detected. Installing stow..."
-        sudo dnf install -y stow
-    elif [ -f /etc/debian_version ]; then
+    if [ -f /etc/debian_version ]; then
         echo "📦 Debian/Ubuntu detected. Installing stow..."
         sudo apt-get update && sudo apt-get install -y stow
     fi
@@ -77,7 +74,6 @@ if [ ! -f "$SECRETS_FILE" ]; then
     echo "🔒 Creating empty secrets file at $SECRETS_FILE..."
     (umask 077 && touch "$SECRETS_FILE")
     echo "# Place your secrets here (API Keys, Tokens, etc.)" >> "$SECRETS_FILE"
-    echo "# export NPM_TOKEN='...'" >> "$SECRETS_FILE"
     echo "📝 REMINDER: Don't forget to fill $SECRETS_FILE with your actual tokens manually!"
 else
     echo "🔑 Secrets file already exists. Skipping."
