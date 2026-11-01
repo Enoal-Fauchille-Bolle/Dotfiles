@@ -265,7 +265,9 @@ claude_plugins:
   - superpowers@claude-plugins-official
   - typescript-lsp@claude-plugins-official
 
+# GitKraken publishes no checksum: this one comes from a download of the archive.
 gitkraken_version: 11.1.1
+gitkraken_sha256: 3d9937ab015be1af403e801b52a38740108fc3501fff89dda0115cf31e96d6b2
 ollama_version: 0.34.0
 
 ################################## desktop ##################################
