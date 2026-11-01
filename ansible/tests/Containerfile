@@ -1,0 +1,12 @@
+# A fresh Debian 13 with systemd running, reached by a regular user in the sudo
+# group: what bootstrap.sh expects, apart from the desktop session.
+FROM docker.io/library/debian:13
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       ansible ca-certificates curl dbus git locales python3-apt sudo systemd systemd-sysv \
+    && useradd --create-home --shell /bin/bash --groups sudo tester \
+    && echo 'tester ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/tester
+
+STOPSIGNAL SIGRTMIN+3
+CMD ["/lib/systemd/systemd"]

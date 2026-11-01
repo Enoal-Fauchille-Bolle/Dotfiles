@@ -67,9 +67,9 @@ automatically. Node is the exception: its version is in
 `home/mise/.config/mise/config.toml`.
 
 Direct downloads carry a SHA-256 checksum next to their version, and a mismatch
-stops the run. Bumping one of them means updating both values. GitKraken has no
-checksum yet, and the install scripts piped into a shell (rustup, Homebrew, uv,
-pnpm, bun, Ollama, Claude Code) are not covered. Archives stay in
+stops the run. Bumping one of them means updating both values. The install
+scripts piped into a shell (rustup, Homebrew, uv, pnpm, bun, Ollama, Claude
+Code) are not covered. Archives stay in
 `~/.cache/dotfiles-downloads`, so the next run does not fetch them again.
 
 ## Manual steps after the playbook
@@ -106,7 +106,14 @@ Secrets never live in the repository. After the first run:
 
 ## What a container cannot test, and how to check it in a VM
 
-The playbook is tested in a privileged Debian 13 container with systemd.
+`ansible/tests/run-in-container.sh` runs the playbook on the committed tree in a
+privileged Debian 13 container with systemd, twice, and fails unless the second
+run changes nothing. Arguments go to `ansible-playbook`, `CONTAINER_ENGINE`
+selects `podman` (the default) or `docker`, and `CARGO_BUILD_JOBS` limits the Rust
+compilation on a machine short of memory. It takes all the CPU for a while, so a
+VM suits it better than a laptop in use. GitHub Actions runs it too, when the CI
+workflow is started by hand.
+
 The points below need a VM (fresh Debian 13 with GNOME, user in `sudo`).
 Run `bootstrap.sh` there, reboot, then check:
 
