@@ -1,139 +1,25 @@
 # Dotfiles
 
-Centralized development environment setup: automated installation via GNU Stow for Fedora, Zsh, and Git configurations.
+Configuration of a Debian 13 GNOME workstation: dotfiles linked with GNU Stow, and an Ansible playbook that rebuilds the whole machine.
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Installation](#installation)
-4. [Repository Structure](#repository-structure)
-5. [Secrets Management](#secrets-management)
-6. [Included Configurations](#included-configurations)
-7. [Debian Workstation Rebuild](#debian-workstation-rebuild)
-8. [Post-Installation](#post-installation)
-
-## Overview
-
-This repository contains my personal configuration files (dotfiles) for Linux environments. It is designed to be portable and modular, utilizing **GNU Stow** to manage symlinks. The primary environment is Fedora 43, but the setup is compatible with Debian-based systems (Ubuntu/Debian) for server or secondary machine usage.
-
-The goal is to replicate a consistent development workflow across different machines instantly, covering shell configuration, version control settings, and development tools.
-
-## Prerequisites
-
-Before installing, ensure the following are available on your system:
-
-* **Operating System:** Fedora (Recommended) or Debian/Ubuntu.
-* **Git:** Required to clone this repository.
-* **Internet Connection:** Required to fetch packages and plugins.
+1. [Installation](#installation)
+2. [Repository Structure](#repository-structure)
+3. [Secrets](#secrets)
+4. [Default Applications](#default-applications)
+5. [Node and Project Variables](#node-and-project-variables)
+6. [Claude Code Session Budget](#claude-code-session-budget)
+7. [Post-Installation](#post-installation)
+8. [License](#license)
 
 ## Installation
 
-The installation process is automated via a shell script that detects the distribution, installs GNU Stow if missing, and creates the necessary symlinks.
+Two entry points exist, depending on how much of the machine needs setting up.
 
-1. **Clone the repository** into your home directory:
+### Full rebuild
 
-    ```bash
-    git clone git@github.com:Enoal-Fauchille-Bolle/Dotfiles.git ~/Dotfiles
-    ```
-
-2. **Navigate to the directory:**
-
-    ```bash
-    cd ~/Dotfiles
-    ```
-
-3. **Run the installation script:**
-
-    ```bash
-    ./install.sh
-    ```
-
-This script will:
-
-* Install `stow` (via `dnf` or `apt`).
-* Iterate through the package directories.
-* Symlink configuration files to your `$HOME` directory.
-* Initialize the local secrets configuration file.
-
-## Repository Structure
-
-This project uses GNU Stow to manage packages. Each top-level directory represents a "package" that will be symlinked to the target directory (usually `$HOME`).
-
-```text
-~/Dotfiles
-├── atuin           # Shell history (SQLite backed, synced across machines)
-├── claude          # Claude Code configuration
-├── git             # Git global configuration and ignores
-├── scripts         # Personal executables and utility scripts
-├── ssh             # SSH configuration (config file only, no keys)
-├── wakatime        # Wakatime configuration for time tracking
-├── zsh             # Zsh, Oh My Zsh, and Powerlevel10k setup
-├── ansible         # Full Debian workstation rebuild playbook (see below)
-├── bootstrap.sh    # Entry point for the Ansible rebuild
-├── install.sh      # Automation script
-└── README.md       # Documentation
-```
-
-## Secrets Management
-
-For security reasons, sensitive information (API tokens, private keys) is **not** committed to this repository.
-
-The installation script creates a local file named `.zshrc.secrets` in your home directory. This file is sourced automatically by `.zshrc`.
-
-To add your secrets, edit the file manually after installation:
-
-```bash
-nano ~/.zshrc.secrets
-```
-
-**Example content:**
-
-```bash
-export NPM_TOKEN="your-private-npm-token"
-export WAKATIME_API_KEY="your-private-wakatime-api-key"
-```
-
-## Included Configurations
-
-* **Shell:** Zsh with Oh My Zsh framework and Powerlevel10k theme.
-* **History:** Atuin, bound to `ctrl-r`. The up arrow keeps its native Zsh behaviour, and the fzf `ctrl-t` / `alt-c` widgets are untouched.
-* **Version Control:** Global Git configuration, standard ignores.
-* **Development:**
-  * VS Code settings (user preferences, keybindings).
-  * NPM configuration (registry settings).
-  * Clang-format (Epitech C/C++ coding style).
-  * Claude Code: global instructions, status line, session budget guard, and the `/handoff` skill.
-* **System:**
-  * Custom utility scripts added to `PATH`.
-  * Nix channels configuration.
-  * MIME type associations.
-
-### Claude Code session budget
-
-Claude cannot see how full its own context window is — no hook receives that
-number ([claude-code#27969](https://github.com/anthropics/claude-code/issues/27969)),
-so a rule telling it to warn past a threshold would be pure guesswork. The two
-files here close that gap by splitting the job in half:
-
-* `statusline-command.sh` is the **sensor**. The status line is the only
-  component handed live context, cost and rate-limit metrics, so it publishes
-  them to `~/.claude/state/ctx-<session>.txt` on every redraw.
-* `hooks/budget-guard.sh` is the **actuator**. It runs on `UserPromptSubmit` —
-  the only event whose stdout becomes context Claude can act on — reads that
-  state file, and falls back to summing the transcript's last assistant turn
-  when the status line has gone stale. Below every threshold it prints nothing,
-  so it costs no tokens on the vast majority of prompts.
-
-The thresholds it reports are named, never explained: what to do about each one
-lives in `CLAUDE.md`, which is re-injected from disk after every compaction.
-
-## Debian Workstation Rebuild
-
-For a full laptop rebuild (Debian 13, GNOME) beyond what `install.sh` covers —
-apt packages, system settings, toolchains, Flatpak apps, GNOME extensions,
-fonts, and services — there is an Ansible playbook in `ansible/`, run through
-`bootstrap.sh`:
+`bootstrap.sh` runs the Ansible playbook: apt packages, system settings, toolchains, Flatpak apps, GNOME extensions, fonts, services, and the dotfiles themselves.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
@@ -141,32 +27,110 @@ curl -fsSL https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main
 wget -qO- https://raw.githubusercontent.com/Enoal-Fauchille-Bolle/Dotfiles/main/bootstrap.sh | bash
 ```
 
-The script only runs on Debian 13 (Ubuntu and other derivatives are refused)
-and needs the regular user in the `sudo` group. See
-[`ansible/README.md`](ansible/README.md) for usage, layout, manual
-post-playbook steps, and the VM checklist for what a container can't test.
+The script only runs on Debian 13 (Ubuntu and other derivatives are refused) and needs the regular user in the `sudo` group. [`ansible/README.md`](ansible/README.md) covers usage, layout, the manual steps after the playbook, and the VM checklist for what a container can't test.
+
+### Dotfiles only
+
+`install.sh` links the configuration files and installs nothing else apart from Stow, which it gets from `apt`. Zsh, Oh My Zsh, mise and the other tools these files expect have to be present already. The repository must be cloned into `~/Dotfiles`:
+
+```bash
+git clone https://github.com/Enoal-Fauchille-Bolle/Dotfiles.git ~/Dotfiles
+cd ~/Dotfiles
+./install.sh
+```
+
+The script:
+
+- Moves any regular file standing where a link must go to `~/.dotfiles-backup/<date>/`.
+- Links each package listed in its `PACKAGES` array into `$HOME`.
+- Creates `~/.zshrc.secrets` and `~/.wakatime.key`, both empty and readable by their owner only.
+
+## Repository Structure
+
+```text
+~/Dotfiles
+├── home/           # Stow packages, one folder per tool
+├── ansible/        # Debian workstation playbook
+├── bootstrap.sh    # Entry point of the playbook
+├── install.sh      # Links the packages, creates the local secret files
+├── LICENSE
+└── README.md
+```
+
+Each folder in `home/` mirrors `$HOME`, so `home/zsh/.zshrc` becomes a link at `~/.zshrc`. Stow runs with `--no-folding`: it links files one by one, and directories such as `~/.claude` or `~/.local` stay real directories.
+
+| Package | Contents |
+| --- | --- |
+| `atuin` | Shell history settings. `.zshrc` binds it to `ctrl-r`, and the up arrow keeps its native Zsh behaviour. |
+| `claude` | Claude Code global instructions, settings, status line, budget hook and `/handoff` skill. |
+| `desktop` | Default applications, the Ptyxis launcher and icon, the `moodledl://` link handler. |
+| `git` | Global Git configuration and ignores. |
+| `input-remapper` | Keyboard and mouse presets, loaded at login. |
+| `mise` | Global Node version and mise settings. |
+| `scripts` | Executables for `~/.local/bin`: restic backup, snapshot browser, battery alert, VPN toggle, mouse daemon. |
+| `ssh` | SSH client configuration, without keys or private hosts. |
+| `systemd` | User units and timers for the backup, the battery alert and the mouse daemon. |
+| `wakatime` | WakaTime settings. The API key is read from `~/.wakatime.key`. |
+| `zsh` | `.zshrc`, `.zprofile` and the Powerlevel10k prompt. |
+
+## Secrets
+
+Tokens and private keys stay out of this repository. They live in local files:
+
+- **`~/.zshrc.secrets`**: variables needed in every shell, sourced by `.zshrc`.
+- **`~/.wakatime.key`**: the WakaTime API key alone, without comments.
+- **`~/.config/restic/env`** and **`~/.config/battery-discord/config`**: created by the playbook, filled by hand.
+- **`mise.local.toml`**: variables for a single project, ignored by the global Git ignores (see [Node and Project Variables](#node-and-project-variables)).
+- **`~/.ssh/`**: the keys and the private host list in `config.d/`, which the tracked `config` includes. Both come back from the restic backup.
+
+## Default Applications
+
+Default applications are set in two layers, because the [freedesktop specification](https://specifications.freedesktop.org/mime-apps/latest/file.html) reads `~/.config/mimeapps.list` before `~/.local/share/applications/mimeapps.list`:
+
+- **The base** is `home/desktop/.local/share/applications/mimeapps.list`, tracked here.
+- **Changes made in GNOME** go to `~/.config/mimeapps.list`, which stays out of the repository and takes priority over the base.
+
+To keep such a change on the next machine, copy its line into the tracked file by hand.
+
+## Node and Project Variables
+
+[mise](https://mise.jdx.dev/) installs Node and loads variables per project.
+
+- **Node version**: set in `home/mise/.config/mise/config.toml`. A project can ask for another one with `.nvmrc` or `.node-version`, and `package.json` is ignored. Only `mise install` downloads a missing version, so cloning a repository never triggers a download.
+- **Graphical programs**: they never read `.zshrc`, so `.zprofile` puts the mise shims on their `PATH`.
+- **Project variables**: go in a `mise.local.toml` at the root of the project, under `[env]`. mise only loads these variables after `mise trust`, and that approval has to be given again after a restore because it is stored in `~/.local/state/mise`.
+
+## Claude Code Session Budget
+
+Claude cannot see how full its own context window is, because no hook receives that number ([claude-code#27969](https://github.com/anthropics/claude-code/issues/27969)). A rule telling it to warn past a threshold would be guesswork. Two files close that gap:
+
+- **`statusline-command.sh`** is the sensor. The status line is the only component handed live context, cost and rate-limit metrics, so it publishes them to `~/.claude/state/ctx-<session>.txt` on every redraw.
+- **`hooks/budget-guard.sh`** is the actuator. It runs on `UserPromptSubmit`, the only event whose stdout becomes context Claude can act on. It reads that state file and falls back to summing the transcript's last assistant turn when the status line has gone stale. Below every threshold it prints nothing, so most prompts cost no extra tokens.
+
+The hook only names the threshold that was crossed. What to do about each one is in `CLAUDE.md`, which is re-injected from disk after every compaction.
 
 ## Post-Installation
 
-After running the install script, perform the following steps to finalize the setup:
-
-1. **Restart your shell** to apply Zsh changes:
+1. **Shell**: restart it to apply the Zsh changes.
 
     ```bash
     exec zsh
     ```
 
-2. **SSH Keys:** Manually restore your private SSH keys (`id_rsa`) to `~/.ssh/` from a secure backup.
+2. **SSH keys**: restore `~/.ssh/id_ed25519` and its `.pub` from a secure backup. Git commit signing uses the public key.
 
-3. **Atuin:** Install the binary, then hook the machine up to the synced history:
+3. **Atuin**: connect the machine to the synced history. The playbook installs the binary; otherwise, `cargo install atuin` gives the same version on every machine, unlike the distribution packages.
 
     ```bash
-    cargo install atuin     # same version on every machine, unlike the distro packages
     atuin import auto       # one-off, pulls in the existing ~/.zsh_history
     atuin login -u <USERNAME>
     atuin sync
     ```
 
-    On a brand new machine, `atuin login` also asks for the encryption key. History is
-    end-to-end encrypted, so without that key the server has nothing readable to hand back.
-    Print it on an already-synced machine with `atuin key` and keep it in a password manager.
+    On a new machine, `atuin login` also asks for the encryption key. History is end-to-end encrypted, so the server has nothing readable to hand back without it. `atuin key` prints it on a machine that is already synced.
+
+After a full rebuild, the longer list in [`ansible/README.md`](ansible/README.md#manual-steps-after-the-playbook) applies.
+
+## License
+
+GNU General Public License v3, see [`LICENSE`](LICENSE).
