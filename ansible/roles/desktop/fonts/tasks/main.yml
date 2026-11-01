@@ -1,27 +1,50 @@
+- name: Create the download cache
+  ansible.builtin.file:
+    path: "{{ download_cache }}"
+    state: directory
+    mode: '0755'
+
 - name: Create the Nerd Fonts directories
   ansible.builtin.file:
-    path: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item }}"
+    path: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item.name }}"
     state: directory
     mode: '0755'
   loop: "{{ nerd_fonts_archives }}"
+  loop_control:
+    label: "{{ item.name }}"
 
-- name: Download and unpack the Nerd Fonts archives
-  ansible.builtin.unarchive:
-    src: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ item }}.zip"
-    dest: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item }}"
-    remote_src: yes
-    creates: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item }}/.installed"
+# get_url checks the checksum; unarchive alone cannot.
+- name: Download the Nerd Fonts archives
+  ansible.builtin.get_url:
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_fonts_version }}/{{ item.name }}.zip"
+    dest: "{{ download_cache }}/{{ item.name }}-{{ nerd_fonts_version }}.zip"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
   loop: "{{ nerd_fonts_archives }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Unpack the Nerd Fonts archives
+  ansible.builtin.unarchive:
+    src: "{{ download_cache }}/{{ item.name }}-{{ nerd_fonts_version }}.zip"
+    dest: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item.name }}"
+    remote_src: yes
+    creates: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item.name }}/.installed"
+  loop: "{{ nerd_fonts_archives }}"
+  loop_control:
+    label: "{{ item.name }}"
   register: nerd_fonts_unpacked
 
 - name: Mark the archives as installed
   ansible.builtin.file:
-    path: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item }}/.installed"
+    path: "{{ user_home }}/.local/share/fonts/NerdFonts/{{ item.name }}/.installed"
     state: touch
     mode: '0644'
     modification_time: preserve
     access_time: preserve
   loop: "{{ nerd_fonts_archives }}"
+  loop_control:
+    label: "{{ item.name }}"
   when: nerd_fonts_unpacked.changed
 
 - name: Refresh the font cache

@@ -141,9 +141,12 @@ apt_packages_third_party:
   - claude-desktop
 
 # Packages that exist in no repository: installed from an upstream .deb.
+# The checksums are the ones GitHub publishes for the assets.
 apt_debs:
-  - https://github.com/sezanzeb/input-remapper/releases/download/2.2.1/input-remapper-2.2.1.deb
-  - https://github.com/JonMagon/KDiskMark/releases/download/3.3.0/kdiskmark_3.3.0_amd64.deb
+  - url: https://github.com/sezanzeb/input-remapper/releases/download/2.2.1/input-remapper-2.2.1.deb
+    sha256: 6ad397c517a05cc001d45f821122d18506fe3f4d7bf1cb966b012cac54a949d2
+  - url: https://github.com/JonMagon/KDiskMark/releases/download/3.3.0/kdiskmark_3.3.0_amd64.deb
+    sha256: e6f372d42956eaf08e761f64b60fdd7402691bcd7ad4692ccabdd005e33eba33
 
 ################################## system ###################################
 
@@ -210,12 +213,20 @@ uv_tools:
     bin: fcc-server
     source: https://github.com/Alishahryar1/free-claude-code/archive/refs/heads/main.zip
 
+# Each checksum belongs to the version above it: update both together. They come
+# from dl.k8s.io and get.helm.sh, from the GitHub release assets, and for QDiskInfo,
+# whose release publishes none, from a download of the asset.
 kubectl_version: v1.36.3
+kubectl_sha256: ebbd080e7c2e275093b55915722043257eb24004363e20acb3c4d71919f88336
 helm_version: v4.2.4
+helm_sha256: c306b46f719b0a4da32d0f78ee21bf90ce8d602f15b22ab753f0674d1670a7f3
 k9s_version: v0.51.0
+k9s_sha256: c3752ad51a5a4015a113819c4eeb6e55a4d0e4b8e652494797532f6fc8161dd7
 
 sshm_version: v1.11.0
+sshm_sha256: 8fbec778c28a403a4e8c43f58c476dfa09b66297df8429982ec79503b4cefa37
 qdiskinfo_version: "0.4"
+qdiskinfo_sha256: b0859706094dce364d2a20333b3e720808123caa7b35840fd2c536196b5b4b45
 
 # Archives kept here are not downloaded again by the next run.
 download_cache: "{{ user_home }}/.cache/dotfiles-downloads"
@@ -324,8 +335,10 @@ gnome_extensions:
   - top-bar-organizer@julian.gse.jsts.xyz
 
 nerd_fonts_version: v3.4.0
+# The checksums are in the SHA-256.txt of the release.
 nerd_fonts_archives:
-  - DroidSansMono
+  - name: DroidSansMono
+    sha256: 030229341907c833862f00682f0f4bce65d0dc8d281fc9a40d80b7ee9d306e88
 
 ################################# services ##################################
 

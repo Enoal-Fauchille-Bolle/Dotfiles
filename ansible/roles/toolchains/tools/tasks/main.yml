@@ -1,6 +1,23 @@
+- name: Create the download cache and ~/.local/bin
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ download_cache }}"
+    - "{{ user_home }}/.local/bin"
+
+# get_url checks the checksum; unarchive alone cannot.
+- name: Download sshm
+  ansible.builtin.get_url:
+    url: "https://github.com/Gu1llaum-3/sshm/releases/download/{{ sshm_version }}/sshm_Linux_x86_64.tar.gz"
+    dest: "{{ download_cache }}/sshm-{{ sshm_version }}_Linux_x86_64.tar.gz"
+    checksum: "sha256:{{ sshm_sha256 }}"
+    mode: '0644'
+
 - name: Install sshm (SSH connection manager)
   ansible.builtin.unarchive:
-    src: "https://github.com/Gu1llaum-3/sshm/releases/download/{{ sshm_version }}/sshm_Linux_x86_64.tar.gz"
+    src: "{{ download_cache }}/sshm-{{ sshm_version }}_Linux_x86_64.tar.gz"
     dest: /usr/local/bin
     remote_src: yes
     include: [sshm]
@@ -12,19 +29,10 @@
   ansible.builtin.get_url:
     url: "https://github.com/edisionnano/QDiskInfo/releases/download/{{ qdiskinfo_version }}/QDiskInfo_X86_64"
     dest: /usr/local/bin/QDiskInfo
+    checksum: "sha256:{{ qdiskinfo_sha256 }}"
     mode: '0755'
   become: true
 
-- name: Create the directories of the release binaries
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - "{{ download_cache }}"
-    - "{{ user_home }}/.local/bin"
-
-# get_url checks the checksum; unarchive alone cannot.
 - name: Download the release binaries
   ansible.builtin.get_url:
     url: "{{ item.url }}"

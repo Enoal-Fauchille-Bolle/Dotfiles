@@ -12,10 +12,27 @@
     state: present
   become: true
 
-- name: Install upstream .deb packages that no repository provides
-  ansible.builtin.apt:
-    deb: "{{ item }}"
+- name: Create the download cache
+  ansible.builtin.file:
+    path: "{{ download_cache }}"
+    state: directory
+    mode: '0755'
+
+# get_url checks the checksum; apt cannot when it fetches a URL itself.
+- name: Download upstream .deb packages that no repository provides
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ download_cache }}/{{ item.url | basename }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
   loop: "{{ apt_debs }}"
   loop_control:
-    label: "{{ item | basename }}"
+    label: "{{ item.url | basename }}"
+
+- name: Install the upstream .deb packages
+  ansible.builtin.apt:
+    deb: "{{ download_cache }}/{{ item.url | basename }}"
+  loop: "{{ apt_debs }}"
+  loop_control:
+    label: "{{ item.url | basename }}"
   become: true

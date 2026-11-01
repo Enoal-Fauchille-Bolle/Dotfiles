@@ -66,6 +66,12 @@ Nerd Fonts). Bump a version there and re-run; nothing is uninstalled
 automatically. Node is the exception: its version is in
 `home/mise/.config/mise/config.toml`.
 
+Direct downloads carry a SHA-256 checksum next to their version, and a mismatch
+stops the run. Bumping one of them means updating both values. GitKraken has no
+checksum yet, and the install scripts piped into a shell (rustup, Homebrew, uv,
+pnpm, bun, Ollama, Claude Code) are not covered. Archives stay in
+`~/.cache/dotfiles-downloads`, so the next run does not fetch them again.
+
 ## Manual steps after the playbook
 
 Secrets never live in the repository. After the first run:

@@ -2,12 +2,27 @@
   ansible.builtin.get_url:
     url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
     dest: /usr/local/bin/kubectl
+    checksum: "sha256:{{ kubectl_sha256 }}"
     mode: '0755'
   become: true
 
+- name: Create the download cache
+  ansible.builtin.file:
+    path: "{{ download_cache }}"
+    state: directory
+    mode: '0755'
+
+# get_url checks the checksum; unarchive alone cannot.
+- name: Download helm
+  ansible.builtin.get_url:
+    url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    dest: "{{ download_cache }}/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    checksum: "sha256:{{ helm_sha256 }}"
+    mode: '0644'
+
 - name: Install helm
   ansible.builtin.unarchive:
-    src: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    src: "{{ download_cache }}/helm-{{ helm_version }}-linux-amd64.tar.gz"
     dest: /usr/local/bin
     remote_src: yes
     include: [linux-amd64/helm]
@@ -22,9 +37,16 @@
     state: directory
     mode: '0755'
 
+- name: Download k9s
+  ansible.builtin.get_url:
+    url: "https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz"
+    dest: "{{ download_cache }}/k9s-{{ k9s_version }}_Linux_amd64.tar.gz"
+    checksum: "sha256:{{ k9s_sha256 }}"
+    mode: '0644'
+
 - name: Install k9s
   ansible.builtin.unarchive:
-    src: "https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz"
+    src: "{{ download_cache }}/k9s-{{ k9s_version }}_Linux_amd64.tar.gz"
     dest: "{{ user_home }}/.local/opt/k9s-{{ k9s_version }}"
     remote_src: yes
     include: [k9s]
