@@ -49,7 +49,7 @@ ansible/
 │   ├── all.yml            # imports the five below, in order
 │   ├── base.yml           # repos, packages, system settings, user
 │   ├── shell.yml          # zsh, oh-my-zsh, p10k, install.sh (stow)
-│   ├── toolchains.yml     # rust, node, bun, homebrew, python, k8s, tools, claude, gitkraken
+│   ├── toolchains.yml     # rust, homebrew, node, bun, python, k8s, tools, claude, gitkraken
 │   ├── desktop.yml        # flatpak, gnome extensions, fonts, dconf
 │   └── services.yml       # ollama, restic backup, user systemd units
 └── roles/<domain>/<role>/ # tags: [domain, role]
@@ -61,9 +61,10 @@ packages. The role only calls it when a dry run of stow reports a missing
 link, so it stays idempotent.
 
 Versions of tools installed outside apt are pinned in `group_vars/all.yml`
-(rustup, nvm, Node, pnpm, bun, kubectl, helm, k9s, sshm, QDiskInfo,
-GitKraken, Ollama, Nerd Fonts). Bump a version there and re-run; nothing is
-uninstalled automatically.
+(rustup, pnpm, bun, kubectl, helm, k9s, sshm, QDiskInfo, GitKraken, Ollama,
+Nerd Fonts). Bump a version there and re-run; nothing is uninstalled
+automatically. Node is the exception: its version is in
+`home/mise/.config/mise/config.toml`.
 
 ## Manual steps after the playbook
 
@@ -85,6 +86,9 @@ Secrets never live in the repository. After the first run:
 - Personal data: `restic restore latest --target /`, once
   `~/.config/restic/env` is filled ("Restore" in
   `roles/services/restic/README.md`).
+- Project secrets: the restore brings back each `mise.local.toml`, but not its
+  approval, which stays in `~/.local/state/mise`. Run `mise trust` in each of
+  those projects.
 - Reboot. The Zsh login shell, the new groups (docker, input), the GNOME
   extensions and the Flatpak apps only apply to a fresh session, and logging
   out is not enough: `systemd --user` keeps running as long as any session of

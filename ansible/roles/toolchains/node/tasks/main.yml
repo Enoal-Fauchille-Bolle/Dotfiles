@@ -1,41 +1,19 @@
-#################################### nvm ####################################
-# PROFILE=/dev/null keeps the installer from appending to .zshrc, which
-# already sources nvm.
+################################### mise ####################################
+# mise comes from the Homebrew role, and the Node version from
+# home/mise/.config/mise/config.toml, linked by the shell playbook.
 
-- name: Install nvm
-  ansible.builtin.shell: |
-    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | PROFILE=/dev/null bash
+- name: List what the global mise config still misses
+  ansible.builtin.command: "{{ homebrew_prefix }}/bin/mise ls --global --missing"
   args:
-    creates: "{{ user_home }}/.nvm/nvm.sh"
-
-- name: Check whether Node {{ node_version }} is installed
-  ansible.builtin.shell: |
-    . "{{ user_home }}/.nvm/nvm.sh" && nvm version {{ node_version }}
-  args:
-    executable: /bin/bash
-  register: node_present
+    chdir: "{{ user_home }}"
+  register: mise_missing
   changed_when: false
-  failed_when: false
 
-- name: Install Node {{ node_version }} and make it the default
-  ansible.builtin.shell: |
-    . "{{ user_home }}/.nvm/nvm.sh" && nvm install {{ node_version }} && nvm alias default {{ node_version }}
+- name: Install what the global mise config requests
+  ansible.builtin.command: "{{ homebrew_prefix }}/bin/mise install"
   args:
-    executable: /bin/bash
-  when: node_present.stdout == 'N/A'
-
-- name: Read the default Node alias
-  ansible.builtin.command: cat "{{ user_home }}/.nvm/alias/default"
-  register: node_default
-  changed_when: false
-  failed_when: false
-
-- name: Point the default alias at Node {{ node_version }}
-  ansible.builtin.shell: |
-    . "{{ user_home }}/.nvm/nvm.sh" && nvm alias default {{ node_version }}
-  args:
-    executable: /bin/bash
-  when: node_default.stdout != node_version
+    chdir: "{{ user_home }}"
+  when: mise_missing.stdout | length > 0
 
 #################################### pnpm ###################################
 # SHELL=/bin/sh: the installer only edits rc files for shells it knows, and

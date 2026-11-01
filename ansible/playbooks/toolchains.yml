@@ -3,6 +3,11 @@
   roles:
     - { role: toolchains/rust, tags: [toolchains, rust] }
 
+- name: Homebrew
+  hosts: all
+  roles:
+    - { role: toolchains/homebrew, tags: [toolchains, homebrew] }
+
 - name: Node
   hosts: all
   roles:
@@ -12,11 +17,6 @@
   hosts: all
   roles:
     - { role: toolchains/bun, tags: [toolchains, bun] }
-
-- name: Homebrew
-  hosts: all
-  roles:
-    - { role: toolchains/homebrew, tags: [toolchains, homebrew] }
 
 - name: Python user tools
   hosts: all
