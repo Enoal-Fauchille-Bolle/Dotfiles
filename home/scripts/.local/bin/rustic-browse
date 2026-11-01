@@ -51,6 +51,7 @@ access_key_id = "$AWS_ACCESS_KEY_ID"
 secret_access_key = "$AWS_SECRET_ACCESS_KEY"
 EOF
 
+# shellcheck disable=SC2153  # RESTIC_PASSWORD comes from the env file, not a typo
 export RUSTIC_PASSWORD=$RESTIC_PASSWORD
 unset RESTIC_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY KUMA_PUSH_URL
 

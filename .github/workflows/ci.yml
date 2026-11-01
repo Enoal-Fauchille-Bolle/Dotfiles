@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    # The same Debian release, and so the same Ansible, as the machine it builds.
+    container: debian:13
+    steps:
+      - name: Install the tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ansible ca-certificates git shellcheck
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run shellcheck on every shell script
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git ls-files -z | xargs -0 grep -lIE '^#! ?(/usr/bin/env |/bin/|/usr/bin/)(ba|da)?sh\b' | xargs shellcheck
+      - name: Check the playbook syntax
+        working-directory: ansible
+        run: ansible-playbook --syntax-check playbooks/all.yml
+
+  # Started by hand: compiling the toolchains takes far longer than a lint.
+  playbook:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run the playbook twice in a Debian 13 container
+        run: ansible/tests/run-in-container.sh
+        env:
+          CONTAINER_ENGINE: docker

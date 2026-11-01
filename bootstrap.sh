@@ -27,6 +27,7 @@ if [ ! -r /etc/os-release ]; then
     echo "❌ Cannot read /etc/os-release: this script only supports Debian 13." >&2
     exit 1
 fi
+# shellcheck source=/dev/null
 . /etc/os-release
 if [ "${ID:-}" != "debian" ]; then
     echo "❌ This script only supports Debian, not ${PRETTY_NAME:-this system}." >&2
