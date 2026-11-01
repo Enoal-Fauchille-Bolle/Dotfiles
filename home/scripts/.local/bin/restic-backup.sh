@@ -61,4 +61,13 @@ forget_args=(--group-by host --keep-daily 7 --keep-weekly 4 --keep-monthly 12)
 [[ $(date +%u) == 7 ]] && forget_args+=(--prune)
 restic forget "${forget_args[@]}" || fail "restic forget failed (exit $?)"
 
+# A backup that succeeds says nothing about the data already stored. Once a week,
+# whichever day the laptop is on, check the repository's structure and read 5% of
+# its data, picked at random. Reading all of it would download the whole bucket.
+check_stamp="$CONFIG_DIR/last-check"
+if [[ -z $(find "$check_stamp" -mtime -7 2>/dev/null) ]]; then
+    restic check --read-data-subset=5% || fail "restic check failed (exit $?)"
+    touch "$check_stamp"
+fi
+
 push up "$message"
