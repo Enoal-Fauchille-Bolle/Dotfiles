@@ -1,0 +1,10 @@
+[tools]
+node = "24"
+
+[settings]
+# A version a project asks for is installed on request (`mise install`): a .nvmrc
+# from a cloned repository needs no trust, so it must not trigger a download.
+not_found_auto_install = false
+idiomatic_version_file_enable_tools = ["node"]
+# package.json stays out: its devEngines field would pick a version for any project.
+idiomatic_version_file_disable_files = ["node:package.json"]

@@ -6,6 +6,7 @@ DOTFILES_DIR="$HOME/Dotfiles"
 PACKAGES=(
     zsh
     git
+    mise
     wakatime
     ssh
     scripts

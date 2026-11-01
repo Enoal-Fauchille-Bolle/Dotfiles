@@ -74,10 +74,6 @@ export LESS="-RFMiS --incsearch --use-color -j.5"
 # [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 # eval "$(pyenv init -)"
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
 # Zsh Syntax Highlighting
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
@@ -109,13 +105,17 @@ esac
   path=(${path:#/home/linuxbrew/.linuxbrew/(bin|sbin)} /home/linuxbrew/.linuxbrew/bin /home/linuxbrew/.linuxbrew/sbin)
 }
 
+# mise - Node and per-project variables. Must stay after the Homebrew block: called
+# by its absolute path, or with Homebrew missing from PATH, mise would put the
+# Homebrew bin dir ahead of the Debian tools.
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+
 # Tirith
 # eval "$(tirith init --shell zsh)"
 
 # Bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Atuin - binds ctrl-r, leaves the up arrow and the fzf ctrl-t/alt-c widgets alone.
 # --disable-ai drops the '?' binding, which sends prompts off to a third party.
