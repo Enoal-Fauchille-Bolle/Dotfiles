@@ -105,7 +105,6 @@ ctx_tokens=$(echo "$input" | jq -r '
   | if $sum > 0 then $sum
     else ((.context_window.context_window_size // 0) * (.context_window.used_percentage // 0) / 100 | floor)
     end')
-window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 lines_add=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
 lines_del=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
@@ -301,49 +300,10 @@ updated_part=" ${DIM}|${RESET} ${DIM}⟳ $(date -d "@$now" +%H:%M:%S)${RESET}"
 
 line2="${five_part} ${DIM}|${RESET} ${week_part}${updated_part}"
 
-# ── Sensor: publish these numbers for the budget hook ──
-# The status line is the only mechanism Claude Code hands live context and
-# rate-limit metrics to; hooks receive neither (anthropics/claude-code#27969).
-# Dropping them in a per-session state file is what lets budget-guard.sh warn
-# *before* a request is sent instead of after the money is spent. Keyed by the
-# transcript's basename, which is the session id, so two panes never collide.
-# Runs on every redraw, so it stays a single printf into a fixed path.
-if [ -n "$transcript" ]; then
-  state_dir="$HOME/.claude/state"
-  if mkdir -p "$state_dir" 2>/dev/null; then
-    printf 'pct=%s\ntokens=%s\nwindow=%s\ncost=%s\nfive=%s\nseven=%s\nfive_reset=%s\nseven_reset=%s\ncache_expiry=%s\n' \
-      "${used_int:-}" "${ctx_tokens:-0}" "${window_size:-0}" "${cost:-0}" \
-      "${five_pct%%.*}" "${week_pct%%.*}" "${five_reset%%.*}" "${week_reset%%.*}" \
-      "${cache_expiry:-0}" \
-      > "$state_dir/ctx-$(basename "$transcript" .jsonl).txt" 2>/dev/null
-  fi
-fi
-
-# ── Recorder: append the official quota to a history, one line per change ──
-# The sensor above is overwritten on every redraw, so no history of the real
-# /usage percentages survives it. claude-usage needs that history to replace its
-# hand-calibrated budgets with a measured $-per-% ratio, and to estimate the
-# share of the limit spent outside this machine (claude.ai, other devices).
-# Deduplicated against the last recorded values of the same account, so a
-# redraw that changes nothing writes nothing. The account is the config dir's
-# basename (.claude, .claude2): each Pro seat has its own limits.
-if [ -n "$five_pct" ] || [ -n "$week_pct" ]; then
-  state_dir="$HOME/.claude/state"
-  account=$(basename "${CLAUDE_CONFIG_DIR:-$HOME/.claude}")
-  key="${five_pct}|${week_pct}|${five_reset}|${week_reset}"
-  last_file="$state_dir/quota-last-${account}.txt"
-  if mkdir -p "$state_dir" 2>/dev/null \
-     && [ "$key" != "$(cat "$last_file" 2>/dev/null)" ]; then
-    printf '%s' "$key" > "$last_file" 2>/dev/null
-    jq -nc --argjson ts "$now" --arg account "$account" \
-      --arg five "$five_pct" --arg seven "$week_pct" \
-      --arg five_reset "$five_reset" --arg seven_reset "$week_reset" \
-      '{ts: $ts, account: $account,
-        five: ($five | tonumber? // null), seven: ($seven | tonumber? // null),
-        five_reset: ($five_reset | tonumber? // null),
-        seven_reset: ($seven_reset | tonumber? // null)}' \
-      >> "$state_dir/quota-history.jsonl" 2>/dev/null
-  fi
-fi
+# ── Saved by claude-usage: the quota history and the figures its hook reads ──
+# In the background so the display never waits for Python, with its output closed
+# because a background job that inherits stdout holds the status line back. By
+# full path because a graphical session has no ~/.local/bin in its PATH.
+printf '%s' "$input" | "$HOME/.local/bin/claude-usage" record >/dev/null 2>&1 &
 
 printf '%b' "${out}\n${line2}"
