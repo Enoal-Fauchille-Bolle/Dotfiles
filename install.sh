@@ -54,6 +54,10 @@ if ! command -v stow &> /dev/null; then
 fi
 
 # 2. Run Stow for each package
+# A failed package (a file or foreign link in the way) does not stop the others,
+# but the script exits with 1 at the end, so that Ansible does not report a
+# success while links are missing.
+FAILED=()
 cd "$DOTFILES_DIR/home" || exit
 for pkg in "${PACKAGES[@]}"; do
     if [ -d "$pkg" ]; then
@@ -63,7 +67,7 @@ for pkg in "${PACKAGES[@]}"; do
         # directories such as ~/.local or ~/.claude stay real directories instead
         # of links into this repository. -t is required: the default target is
         # the parent of the current directory, which is the repository itself.
-        stow -R --no-folding -t "$HOME" "$pkg"
+        stow -R --no-folding -t "$HOME" "$pkg" || FAILED+=("$pkg")
     else
         echo "⚠️  Warning: $pkg not found"
     fi
@@ -89,6 +93,11 @@ if [ ! -f "$WAKATIME_KEY_FILE" ]; then
     echo "📝 REMINDER: Paste your WakaTime API key (the key alone) into $WAKATIME_KEY_FILE!"
 else
     echo "🔑 WakaTime key file already exists. Skipping."
+fi
+
+if [ "${#FAILED[@]}" -gt 0 ]; then
+    echo "❌ Stow failed for: ${FAILED[*]}. Remove what stands in the way (see the messages above) and run this script again." >&2
+    exit 1
 fi
 
 echo "✅ Done! Restart your shell."
