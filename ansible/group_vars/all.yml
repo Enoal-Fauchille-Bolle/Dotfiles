@@ -212,7 +212,7 @@ uv_tools:
   # Needs uv 0.13.6 or later. A git source, because its version comes from the tag.
   - name: free-claude-code
     bin: fcc-server
-    source: "git+https://github.com/Alishahryar1/free-claude-code@v6.18.5"
+    source: "git+https://github.com/Alishahryar1/free-claude-code@v6.18.9"
 
 # Each checksum belongs to the version above it: update both together. They come
 # from dl.k8s.io and get.helm.sh, from the GitHub release assets, and for QDiskInfo,
