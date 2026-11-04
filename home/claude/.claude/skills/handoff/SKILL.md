@@ -15,9 +15,37 @@ d'après le dossier courant. Si aucun ne convient, demande à Enoal avant d'en c
 un. Jamais dans un dépôt git : un handoff n'a pas à être versionné, et le dossier
 courant en est souvent un.
 
-Ajoute ensuite une ligne pour ce fichier dans le tableau du projet de
-`~/.claude/exports/README.md`, l'index, et marque comme remplacé le handoff
-précédent du même fil s'il y en a un.
+Le fichier commence par ses propriétés (frontmatter YAML), que lisent les vues
+Obsidian `~/.claude/exports/Handoffs.base` et `<projet>/<projet>.base` :
+
+```yaml
+---
+type: handoff
+projet: <projet>
+statut: en-cours
+date: <AAAA-MM-JJ du nom de fichier>
+titre: "<titre du handoff, sans le préfixe Handoff ni la date>"
+prochaine_etape: "<texte de la section 6, mot pour mot, sans backticks>"
+---
+```
+
+Ajoute, seulement si c'est le cas :
+- `reprise: AAAA-MM-JJ` si la suite ne peut commencer qu'à une date ;
+- `attente: "<phrase>"` si la suite attend un événement extérieur (réveil d'un
+  serveur, action d'Enoal, retour d'un symptôme).
+
+Ne modifie pas `~/.claude/exports/README.md` : l'index ne recopie plus l'état
+des handoffs.
+
+Si ce handoff succède à un autre du même fil (celui que la session a repris, ou
+celui que ce texte dit remplacer), modifie les propriétés du précédent avec Edit,
+sans toucher à son corps :
+- `statut: remplacé` ;
+- `remplace_par: "[[<nom du nouveau fichier sans .md>]]"` ;
+- `cloture: <date du nouveau handoff>` ;
+- retire sa ligne `prochaine_etape`.
+
+Si le précédent est incertain, demande à Enoal plutôt que d'en choisir un.
 
 Le fichier contient ceci, dans cet ordre, et rien d'autre :
 
