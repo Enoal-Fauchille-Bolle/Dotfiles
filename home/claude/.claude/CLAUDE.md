@@ -43,6 +43,9 @@ travailler, pas après :
   la prochaine étape, le modèle et l'effort. Pour l'écrire, suis toujours
   `~/.claude/skills/handoff/SKILL.md`, même quand je le demande en toutes
   lettres plutôt qu'avec `/handoff`.
+  Si la session a repris un handoff et que sa tâche est finie, passer ce
+  handoff à `statut: terminé`, avec `cloture: <date du jour>`, et retirer sa
+  ligne `prochaine_etape`, après me l'avoir annoncé.
 - **Tu vas lire un gros volume** (logs, exploration large, gros fichier) :
   proposer un sous-agent. Son contexte est séparé du tien ; seul le résumé remonte.
 - **Un skill lourd pour un détail** : le dire avant de le charger. Une fois
