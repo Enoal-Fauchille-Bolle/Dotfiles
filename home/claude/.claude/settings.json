@@ -1,5 +1,8 @@
 {
   "cleanupPeriodDays": 99999,
+  "env": {
+    "CLAUDE_CODE_SCROLL_SPEED": "0.25"
+  },
   "model": "sonnet",
   "hooks": {
     "PermissionRequest": [
