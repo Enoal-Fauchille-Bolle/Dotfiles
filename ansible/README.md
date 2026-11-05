@@ -84,7 +84,7 @@ Secrets never live in the repository. After the first run:
 - SSH keys: restore `~/.ssh/id_ed25519` and `.pub` (git commit signing uses
   the public key). The private host list in `~/.ssh/config.d/` comes back with
   the restic restore: the tracked `~/.ssh/config` only includes it.
-- Logins: `sudo tailscale up`, `gh auth login`, `atuin login`, VS Code
+- Logins: `gh auth login`, `atuin login`, VS Code
   (Settings Sync restores extensions and profiles), GitKraken, Claude Code
   and Claude Desktop, Discord, Bitwarden and the other Flatpak apps.
 - `ollama pull qwen3.5:0.8b`.

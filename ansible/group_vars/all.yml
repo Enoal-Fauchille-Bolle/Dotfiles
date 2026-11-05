@@ -108,11 +108,6 @@ apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: stable
     signed_by: https://download.docker.com/linux/debian/gpg
-  - name: tailscale
-    uris: https://pkgs.tailscale.com/stable/debian
-    suites: "{{ ansible_distribution_release }}"
-    components: main
-    signed_by: "https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg"
   - name: vscode
     uris: https://packages.microsoft.com/repos/code
     suites: stable
@@ -135,7 +130,6 @@ apt_packages_third_party:
   - containerd.io
   - docker-buildx-plugin
   - docker-compose-plugin
-  - tailscale
   - code
   - gh
   - claude-desktop
