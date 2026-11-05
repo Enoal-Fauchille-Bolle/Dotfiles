@@ -136,7 +136,9 @@ sec_apt() {
     info "Pending apt upgrades:"
     printf '%s\n' "$pending"
     ((DRY_RUN)) && info "The list comes from the last apt-get update"
-    run sudo apt-get upgrade -y || rc=1
+    # --with-new-pkgs behaves like the apt upgrade alias: new packages (such as a
+    # new kernel) are installed, nothing is ever removed.
+    run sudo apt-get upgrade --with-new-pkgs -y || rc=1
     return $rc
 }
 
