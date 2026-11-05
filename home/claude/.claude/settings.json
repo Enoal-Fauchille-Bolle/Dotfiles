@@ -79,7 +79,14 @@
     "code-review@claude-plugins-official": false,
     "github@claude-plugins-official": false,
     "explanatory-output-style@claude-plugins-official": true,
-    "atlassian-mcp@anthropic-plugin-directory": true
+    "atlassian-mcp@anthropic-plugin-directory": true,
+    "brightdata-plugin@synced": false,
+    "productivity@synced": false,
+    "product-management@synced": false,
+    "engineering@synced": false,
+    "design@synced": false,
+    "cowork-plugin-management@synced": false,
+    "pdf-viewer@synced": false
   },
   "extraKnownMarketplaces": {
     "wakatime": {
