@@ -126,5 +126,10 @@
   "autoContinueAtUsageLimit": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "useAutoModeDuringPlan": true
+  "useAutoModeDuringPlan": true,
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  }
 }
