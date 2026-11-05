@@ -26,7 +26,7 @@ projet: <projet>
 statut: en-cours
 date: <AAAA-MM-JJ du nom de fichier>
 titre: "<titre du handoff, sans le préfixe Handoff ni la date>"
-prochaine_etape: "<texte de la section 6, mot pour mot, sans backticks>"
+prochaine_etape: "<section 6 résumée en 45 caractères au plus, en français, à l'infinitif>"
 ---
 ```
 
