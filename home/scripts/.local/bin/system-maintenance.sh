@@ -20,10 +20,11 @@ declare -A NEEDS=(
 
 usage() {
     cat <<EOF
-Usage: ${0##*/} [--dry-run] [--only SECTION,...] [--ask]
+Usage: ${0##*/} [--dry-run] [--only SECTION,...] [--skip SECTION,...] [--ask]
 
   -n, --dry-run   show what is pending, change nothing, ask no password
   --only LIST     run only these sections (comma separated)
+  --skip LIST     run every section except these (also applies on top of --only)
   -a, --ask       ask before each section
   -h, --help      show this help
 
@@ -40,6 +41,7 @@ fi
 DRY_RUN=0
 ASK=0
 ONLY=()
+SKIP=()
 OK=0 WARN=0 ERR=0 SKIPPED=0
 LOG=''
 SUDO_KEEPALIVE=''
@@ -54,13 +56,19 @@ while (($#)); do
             IFS=, read -ra ONLY <<<"$1"
             ;;
         --only=*) IFS=, read -ra ONLY <<<"${1#--only=}" ;;
+        --skip)
+            shift
+            [[ $# -gt 0 ]] || { usage >&2; exit 2; }
+            IFS=, read -ra SKIP <<<"$1"
+            ;;
+        --skip=*) IFS=, read -ra SKIP <<<"${1#--skip=}" ;;
         -h | --help) usage; exit 0 ;;
         *) usage >&2; exit 2 ;;
     esac
     shift
 done
 
-for name in "${ONLY[@]}"; do
+for name in "${ONLY[@]}" "${SKIP[@]}"; do
     [[ " ${SECTIONS[*]} " == *" $name "* ]] || { echo "Unknown section: $name" >&2; usage >&2; exit 2; }
 done
 
@@ -100,8 +108,11 @@ confirm() {
 }
 
 selected() {
-    ((${#ONLY[@]})) || return 0
     local name
+    for name in "${SKIP[@]}"; do
+        [[ $name == "$1" ]] && return 1
+    done
+    ((${#ONLY[@]})) || return 0
     for name in "${ONLY[@]}"; do
         [[ $name == "$1" ]] && return 0
     done
@@ -333,7 +344,7 @@ main() {
         mkdir -p "$state_dir"
         LOG="$state_dir/$(date +%F_%H%M%S).log"
         find "$state_dir" -name '*.log' -mtime +90 -delete
-        log "start  ${ONLY[*]:-all sections}"
+        log "start  only: ${ONLY[*]:-all}  skip: ${SKIP[*]:-none}"
     fi
     trap '[[ -n $SUDO_KEEPALIVE ]] && kill "$SUDO_KEEPALIVE" 2>/dev/null' EXIT
     trap interrupted INT TERM
