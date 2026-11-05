@@ -314,6 +314,16 @@ print_summary() {
     [[ -n $LOG ]] && info "Log: $LOG"
 }
 
+# Ctrl+C reaches the running command and this script alike. Some tools (apt)
+# catch it and exit normally, so bash would carry on with the next section
+# unless the script stops itself.
+interrupted() {
+    printf '\n'
+    fail "Interrupted"
+    print_summary
+    exit 130
+}
+
 main() {
     local state_dir
     if ((DRY_RUN)); then
@@ -326,6 +336,7 @@ main() {
         log "start  ${ONLY[*]:-all sections}"
     fi
     trap '[[ -n $SUDO_KEEPALIVE ]] && kill "$SUDO_KEEPALIVE" 2>/dev/null' EXIT
+    trap interrupted INT TERM
     start_sudo
 
     local section
