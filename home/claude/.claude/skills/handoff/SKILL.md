@@ -1,78 +1,83 @@
 ---
 name: handoff
-description: Écrit le prompt de reprise de la conversation en cours dans un fichier, avant un /clear.
-argument-hint: "[chemin de destination]"
+description: Writes the resume prompt of the current conversation to a file, before a /clear.
+argument-hint: "[destination path]"
 disable-model-invocation: true
 allowed-tools: Write, Edit
 ---
 
-Construis le prompt de reprise de cette conversation et écris-le dans un fichier.
+Build the resume prompt of this conversation and write it to a file, in English.
 
-Destination : `$ARGUMENTS` s'il est fourni, sinon
-`~/.claude/exports/<projet>/handoffs/handoff-<sujet>-<AAAA-MM-JJ>.md`, où `<projet>`
-est un dossier existant de `~/.claude/exports/` choisi d'après le sujet, pas
-d'après le dossier courant. Si aucun ne convient, demande à Enoal avant d'en créer
-un. Jamais dans un dépôt git : un handoff n'a pas à être versionné, et le dossier
-courant en est souvent un.
+Destination: `$ARGUMENTS` if given, otherwise
+`~/.claude/exports/<project>/handoffs/handoff-<topic>-<YYYY-MM-DD>.md`, where
+`<project>` is an existing folder of `~/.claude/exports/` chosen from the topic, not
+from the current folder. If none fits, ask Enoal before creating one. Never inside a
+git repository: a handoff is not meant to be versioned, and the current folder often
+is one.
 
-Le fichier commence par ses propriétés (frontmatter YAML), que lit la base
-Obsidian `~/.claude/exports/Suivi.base` (vues intégrées au README et à chaque
-page `<projet>/<projet>.md`) :
+The file starts with its properties (YAML frontmatter), read by the Obsidian base
+`~/.claude/exports/Suivi.base` (views embedded in the README and in each
+`<project>/<project>.md` page). Keys and fixed values stay in French, because the base
+filters on them:
 
 ```yaml
 ---
 type: handoff
-projet: <projet>
+projet: <project>
 statut: en-cours
-date: <AAAA-MM-JJ du nom de fichier>
-titre: "<titre du handoff, sans le préfixe Handoff ni la date>"
-prochaine_etape: "<section 6 résumée en 45 caractères au plus, en français, à l'infinitif>"
+date: <YYYY-MM-DD from the file name>
+titre: "<handoff title, without the Handoff prefix or the date>"
+prochaine_etape: "<section 6 summed up in 45 characters at most, starting with a verb>"
 ---
 ```
 
-Ajoute, seulement si c'est le cas :
-- `reprise: AAAA-MM-JJ` si la suite ne peut commencer qu'à une date ;
-- `attente: "<phrase>"` si la suite attend un événement extérieur (réveil d'un
-  serveur, action d'Enoal, retour d'un symptôme).
+Add, only when it applies:
+- `reprise: YYYY-MM-DD` if the follow-up cannot start before a date;
+- `attente: "<sentence>"` if the follow-up waits for an outside event (a server waking
+  up, an action from Enoal, a symptom coming back).
 
-Ne modifie pas `~/.claude/exports/README.md` : l'index ne recopie plus l'état
-des handoffs.
+Do not modify `~/.claude/exports/README.md`: the index no longer copies the state of
+the handoffs.
 
-Si ce handoff succède à un autre du même fil (celui que la session a repris, ou
-celui que ce texte dit remplacer), modifie les propriétés du précédent avec Edit,
-sans toucher à son corps :
-- `statut: remplacé` ;
-- `remplace_par: "[[<nom du nouveau fichier sans .md>]]"` ;
-- `cloture: <date du nouveau handoff>` ;
-- retire sa ligne `prochaine_etape`.
+If this handoff follows another one of the same thread (the one this session resumed,
+or the one this text says it replaces), change the properties of the previous one with
+Edit, without touching its body:
+- `statut: remplacé`;
+- `remplace_par: "[[<name of the new file without .md>]]"`;
+- `cloture: <date of the new handoff>`;
+- remove its `prochaine_etape` line.
 
-Si le précédent est incertain, demande à Enoal plutôt que d'en choisir un.
+If the previous one is uncertain, ask Enoal rather than picking one.
 
-Le fichier contient ceci, dans cet ordre, et rien d'autre :
+The file contains this, in this order, and nothing else:
 
-1. **Objectif** : ce que la session cherchait à obtenir, en une phrase.
-2. **État** : ce qui est fait, ce qui ne l'est pas, ce qui est en cours.
-3. **Décisions et pourquoi** : y compris les pistes écartées et leur raison.
-4. **Fichiers touchés** : chemins exacts, et ce qui a changé dans chacun.
-5. **Vérifications** : commandes lancées et leur résultat ; celles qui restent.
-6. **Prochaine étape** : une seule action, à l'impératif, la plus utile.
-7. **Modèle et effort** recommandés pour la suite, avec la raison.
+1. **Goal**: what the session was trying to achieve, in one sentence.
+2. **State**: what is done, what is not, what is in progress. For each item that is
+   not done or in progress, give the check that proves its state from a fresh
+   session (a command, a PR or ticket to look at, a file to read), so that
+   `/resume-handoff` can verify it before acting.
+3. **Decisions and why**: including the leads ruled out and their reason.
+4. **Files touched**: exact paths, and what changed in each.
+5. **Checks**: commands run and their result; the ones still to run.
+6. **Next step**: one action, in the imperative, the most useful one.
+7. **Model and effort** recommended for the follow-up, with the reason.
 
-Règles d'écriture :
+Writing rules:
 
-- Chemins, identifiants, commandes, messages d'erreur et chiffres **verbatim**.
-- Omettre un fait incertain plutôt que le reconstruire de mémoire.
-- Écrit pour une conversation qui ne sait rien : aucun « comme vu plus haut ».
-- Viser ~2k tokens.
+- Paths, identifiers, commands, error messages and numbers **verbatim**, paths in full
+  from `/` or `~`.
+- Leave out an uncertain fact rather than rebuild it from memory.
+- Written for a conversation that knows nothing: no "as seen above".
+- Aim for ~2k tokens.
 
-Puis, avant de conclure, dis à Enoal laquelle des trois continuités convient ici,
-et pourquoi. C'est sa décision, pas la tienne :
+Then, before concluding, tell Enoal which of the three kinds of continuity fits here,
+and why. The decision belongs to Enoal:
 
-- ce **handoff** (~2k) si la substance tient dans ce que tu viens d'écrire ;
-- un **`/export` collé** (~30k) si la substance est le raisonnement (session
-  d'analyse ou de conception, où tu ne sais pas encore ce qui comptera) ;
-- **`--resume`** (contexte intégral) si la substance est le diff et la sortie des
-  tests, c'est-à-dire précisément ce qu'un export jette.
+- this **handoff** (~2k) if the substance fits in what you just wrote;
+- a **pasted `/export`** (~30k) if the substance is the reasoning (an analysis or
+  design session, where you do not know yet what will matter);
+- **`--resume`** (full context) if the substance is the diff and the test output,
+  exactly what an export throws away.
 
-Termine en affichant le chemin du fichier et en rappelant que `/clear` est
-gratuit, et que la session suivante démarre sur `Lis <chemin> et reprends.`
+End by showing the file path, reminding that `/clear` is free, and that the next
+session starts with `/resume-handoff <path>`.
