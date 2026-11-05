@@ -15,8 +15,9 @@ d'après le dossier courant. Si aucun ne convient, demande à Enoal avant d'en c
 un. Jamais dans un dépôt git : un handoff n'a pas à être versionné, et le dossier
 courant en est souvent un.
 
-Le fichier commence par ses propriétés (frontmatter YAML), que lisent les vues
-Obsidian `~/.claude/exports/Handoffs.base` et `<projet>/<projet>.base` :
+Le fichier commence par ses propriétés (frontmatter YAML), que lit la base
+Obsidian `~/.claude/exports/Suivi.base` (vues intégrées au README et à chaque
+page `<projet>/<projet>.md`) :
 
 ```yaml
 ---
