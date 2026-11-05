@@ -93,11 +93,23 @@ fail() { ERR=$((ERR + 1)); printf '%s\n' "${RED}✗ $1${RESET}"; log "error $1";
 
 header() { printf '\n%s\n' "${BLUE}== $1 ==${RESET}"; }
 
-# Runs a command that changes something; --dry-run only prints it.
+# Runs a command as root. Since sudo 1.9.14 (use_pty), sudo runs the command in
+# its own pseudo-terminal: Ctrl+C reaches the command but neither sudo nor this
+# script. The inner shell turns it into exit code 130, which run() recognises.
+as_root() {
+    sudo bash -c 'trap "exit 130" INT; "$@"; exit $?' bash "$@"
+}
+
+# Runs a command that changes something; --dry-run only prints it. Exit code 130
+# means Ctrl+C: the whole script stops, not just this command.
 run() {
-    printf '%s\n' "${DIM}\$ $*${RESET}"
+    local shown=${*/#as_root/sudo} rc
+    printf '%s\n' "${DIM}\$ $shown${RESET}"
     ((DRY_RUN)) && return 0
     "$@"
+    rc=$?
+    ((rc == 130)) && interrupted
+    return $rc
 }
 
 confirm() {
@@ -138,7 +150,7 @@ start_sudo() {
 
 sec_apt() {
     local rc=0 pending
-    run sudo apt-get update || rc=1
+    run as_root apt-get update || rc=1
     pending=$(apt list --upgradable 2>/dev/null | tail -n +2)
     if [[ -z $pending ]]; then
         info "No apt package to upgrade"
@@ -149,7 +161,7 @@ sec_apt() {
     ((DRY_RUN)) && info "The list comes from the last apt-get update"
     # --with-new-pkgs behaves like the apt upgrade alias: new packages (such as a
     # new kernel) are installed, nothing is ever removed.
-    run sudo apt-get upgrade --with-new-pkgs -y || rc=1
+    run as_root apt-get upgrade --with-new-pkgs -y || rc=1
     return $rc
 }
 
@@ -157,7 +169,7 @@ sec_flatpak() {
     local rc=0
     info "Pending system Flatpak updates:"
     flatpak remote-ls --system --updates --columns=application,version 2>/dev/null
-    run sudo flatpak update --system -y --noninteractive || rc=1
+    run as_root flatpak update --system -y --noninteractive || rc=1
     # The user installation is empty today, but would be updated if it were not.
     if [[ -n $(flatpak list --user --columns=application 2>/dev/null) ]]; then
         run flatpak update --user -y --noninteractive || rc=1
@@ -258,9 +270,9 @@ sec_cleanup() {
         info "apt packages no longer needed:"
         printf '%s\n' "$removable"
     fi
-    run sudo apt-get autoremove -y || rc=1
+    run as_root apt-get autoremove -y || rc=1
     if command -v flatpak >/dev/null; then
-        run sudo flatpak uninstall --system --unused -y --noninteractive || rc=1
+        run as_root flatpak uninstall --system --unused -y --noninteractive || rc=1
     fi
     if command -v brew >/dev/null; then
         run brew cleanup || rc=1
