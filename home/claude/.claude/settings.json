@@ -4,6 +4,11 @@
     "CLAUDE_CODE_SCROLL_SPEED": "0.25"
   },
   "model": "sonnet",
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "hooks": {
     "PermissionRequest": [
       {
@@ -16,6 +21,15 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Bash|mcp__plugin_desktop-commander_desktop-commander__(start_process|interact_with_process)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r \".tool_input.command // .tool_input.input // empty\" | grep -qE \"(^|[;&|(]|then|do)[[:space:]]*git([[:space:]]+(-[cC][[:space:]]+[^[:space:]]+|--[[:alnum:]-]+(=[^[:space:]]+)?|-[[:alpha:]]))*[[:space:]]+push([^[:alnum:]_-]|$)\" && { echo \"Blocked: git push is forbidden, only Enoal pushes.\" >&2; exit 2; } || exit 0"
+          }
+        ]
+      },
       {
         "matcher": "AskUserQuestion",
         "hooks": [
